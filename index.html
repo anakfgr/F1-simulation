@@ -5,14 +5,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&family=JetBrains+Mono:wght@500;700&display=swap">
 <style>
-/* Layout: pit-wall console — map + driver panels left, timing tower right; calendar page is a list + standings split */
+/* Layout: pit-wall console — real track map + driver panels left, timing tower right; calendar page is a list + standings split */
 :root {
   color-scheme: dark;
   --bg: #0B0C0F; --bar: #0E1014; --panel: #14161B; --well: #0F1115; --raised: #1C1F26; --sel: #1F2430;
   --line: #23262E; --line-2: #343944; --line-3: #4A5366;
   --fg: #EEF0F3; --fg-2: #B5BBC6; --fg-3: #9AA1AD; --fg-4: #6E7582; --fg-5: #4E5562;
   --accent: #FF3B30;
-  --green: #3DDC84; --yellow: #F5C46B; --yellow-bg: #2B2414; --red-bg: #2A1414; --red-fg: #FF8A80;
+  --green: #3DDC84; --yellow: #F5C46B; --yellow-bg: #2B2414; --red-bg: #2A1414; --red-fg: #FF8A80; --red: #FF4D4D;
   --purple: #B57CFF; --up: #5AB0FF; --down: #FF9F43;
   --display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
   --body: 'Barlow', system-ui, -apple-system, sans-serif;
@@ -22,8 +22,8 @@
 [hidden] { display: none !important; }
 html, body { background: var(--bg); color: var(--fg); }
 body { margin: 0; font: 15px/1.4 var(--body); -webkit-font-smoothing: antialiased; }
-button { font: inherit; color: inherit; }
-button, a, input { -webkit-tap-highlight-color: transparent; }
+button, select { font: inherit; color: inherit; }
+button, a, input, select { -webkit-tap-highlight-color: transparent; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 h1, h2, h3 { margin: 0; font-family: var(--display); font-weight: 700; text-wrap: balance; }
 .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
@@ -48,44 +48,60 @@ nav a[aria-current="page"] { background: var(--raised); color: #fff; }
 
 main { max-width: 1360px; margin: 0 auto; padding: 24px 16px 48px; display: flex; flex-direction: column; gap: 20px; }
 .card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
-.btn { min-height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--line-2); background: var(--raised); color: var(--fg); font-weight: 600; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+.btn { min-height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--line-2); background: var(--raised); color: var(--fg); font-weight: 600; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
 .btn:hover { border-color: var(--line-3); background: #232731; }
 .btn.ghost { background: transparent; color: var(--fg-2); }
-.btn.warn[aria-pressed="true"] { background: var(--yellow); border-color: var(--yellow); color: #17130A; }
+.btn.sm { min-height: 34px; padding: 0 10px; font-size: 13px; }
 .btn:disabled { opacity: .45; cursor: not-allowed; }
-.seg { display: flex; gap: 4px; padding: 4px; border-radius: 10px; background: var(--bar); border: 1px solid var(--line); }
+.seg { display: flex; gap: 4px; padding: 4px; border-radius: 10px; background: var(--bar); border: 1px solid var(--line); flex-wrap: wrap; }
 .seg button { min-width: 44px; min-height: 36px; padding: 0 10px; border-radius: 7px; border: none; background: transparent; color: var(--fg-2); font: 700 13px var(--mono); cursor: pointer; }
 .seg button:hover { color: var(--fg); }
 .seg button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
 .seg.text button { font: 600 14px var(--body); }
 .pill { display: inline-flex; align-items: center; gap: 8px; padding: 4px 10px; border-radius: 999px; font: 700 12px var(--mono); letter-spacing: .08em; }
-.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
-.live-dot { animation: blink 1.4s ease-in-out infinite; }
+.pill.live { background: var(--red-bg); color: var(--red-fg); }
+.pill.replay { background: var(--yellow-bg); color: var(--yellow); }
+.pill.src { background: #15202C; color: var(--up); }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.live .dot { background: var(--accent); animation: blink 1.4s ease-in-out infinite; }
 @keyframes blink { 50% { opacity: .25; } }
+.select { min-height: 44px; padding: 0 36px 0 12px; border-radius: 10px; border: 1px solid var(--line-2); background: var(--raised) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23B5BBC6' stroke-width='2' fill='none'/%3E%3C/svg%3E") no-repeat right 12px center; color: var(--fg); font-weight: 600; font-size: 14px; appearance: none; cursor: pointer; max-width: 100%; }
+.notice { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; padding: 12px 14px; border-radius: 12px; background: var(--yellow-bg); color: var(--yellow); font-size: 14px; }
+.notice.err { background: var(--red-bg); color: var(--red-fg); }
+.notice p { margin: 0; flex: 1 1 260px; }
 
 /* Live page */
 .topline { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; }
 .topline h1 { font-size: clamp(32px, 6vw, 44px); line-height: 1; }
+.picker { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .stats { display: flex; flex-wrap: wrap; gap: 12px; }
 .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 16px; min-width: 110px; }
-.stat .v { font: 700 26px var(--mono); font-variant-numeric: tabular-nums; display: flex; align-items: center; gap: 8px; }
+.stat .v { font: 700 26px var(--mono); font-variant-numeric: tabular-nums; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
 .stat .v.disp { font-family: var(--display); }
-.flagsq { width: 12px; height: 12px; border-radius: 3px; }
+.stat .v.sm { font-size: 16px; padding-block: 6px; }
+.flagsq { width: 12px; height: 12px; border-radius: 3px; flex: none; }
 .grid-live { display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start; }
 .col-main { flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 20px; }
 .row-cards { display: flex; flex-wrap: wrap; gap: 20px; }
 .row-cards > .card { flex: 1 1 300px; }
 .maphead { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
 .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.map { position: relative; width: 100%; max-width: 100%; aspect-ratio: 640 / 420; background: var(--well); border-radius: 12px; overflow: hidden; }
+.map { position: relative; width: 100%; max-width: 100%; aspect-ratio: 16 / 10; background: var(--well); border-radius: 12px; overflow: hidden; }
 .map svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .car { cursor: pointer; }
 .car:hover .body { stroke: #fff; }
 .banner { position: absolute; left: 50%; top: 14px; transform: translateX(-50%); padding: 6px 14px; border-radius: 8px; font: 700 13px var(--mono); letter-spacing: .08em; white-space: nowrap; }
+.mapmsg { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 24px; color: var(--fg-3); font-size: 15px; }
+.mapmsg small { display: block; margin-top: 6px; color: var(--fg-4); font: 500 12px var(--mono); }
+.locwait { position: absolute; right: 12px; bottom: 10px; font: 600 12px var(--mono); color: var(--fg-4); }
+.timeline { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.timeline input[type=range] { flex: 1 1 240px; accent-color: var(--accent); min-height: 32px; }
+.timeline .tl { font: 600 13px var(--mono); color: var(--fg-2); white-space: nowrap; }
 .kbd { font: 600 12px var(--mono); color: var(--fg-3); }
 .kbd b { display: inline-block; padding: 1px 6px; border: 1px solid var(--line-2); border-radius: 4px; color: var(--fg-2); font-weight: 600; }
+.note { margin: 0; color: var(--fg-3); font-size: 13px; }
 .follow { display: flex; align-items: center; gap: 12px; }
-.follow .stripe { width: 6px; align-self: stretch; border-radius: 3px; }
+.follow .stripe { width: 6px; align-self: stretch; border-radius: 3px; background: var(--line-2); }
 .follow .nm { font: 700 28px/1.05 var(--display); }
 .tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
 .tile { background: var(--bar); border-radius: 10px; padding: 10px 12px; min-width: 0; }
@@ -95,35 +111,37 @@ main { max-width: 1360px; margin: 0 auto; padding: 24px 16px 48px; display: flex
 .followbtns { display: flex; gap: 8px; }
 .followbtns .btn { flex: 1; justify-content: center; }
 .sched { display: flex; flex-direction: column; }
-.sched div { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); }
-.sched div:last-child { border-bottom: 0; }
-.sched .t { font-family: var(--mono); color: var(--fg-2); font-size: 14px; }
-.sched .done span:first-child { color: var(--fg-4); text-decoration: line-through; }
-.sched .now span:first-child::after { content: 'NEXT'; margin-left: 8px; font: 700 10px var(--mono); color: var(--accent); letter-spacing: .08em; }
-.log { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; max-height: 260px; overflow-y: auto; }
+.sched > div { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); min-height: 44px; }
+.sched > div:last-child { border-bottom: 0; }
+.sched .t { font-family: var(--mono); color: var(--fg-2); font-size: 13px; text-align: right; }
+.sched .done .n { color: var(--fg-3); }
+.sched .now .n::after { content: 'NEXT'; margin-left: 8px; font: 700 10px var(--mono); color: var(--accent); letter-spacing: .08em; }
+.sched .on .n::after { content: 'LIVE'; margin-left: 8px; font: 700 10px var(--mono); color: var(--accent); letter-spacing: .08em; }
+.log { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; max-height: 300px; overflow-y: auto; }
 .log li { display: grid; grid-template-columns: 46px 1fr; gap: 10px; padding: 7px 4px; border-bottom: 1px solid var(--line); font-size: 14px; }
 .log .lp { font: 600 12px var(--mono); color: var(--fg-4); padding-top: 2px; }
-.log .k-pit { color: var(--yellow); } .log .k-fl { color: var(--purple); } .log .k-sc { color: var(--yellow); } .log .k-fin { color: #fff; font-weight: 600; } .log .k-ov { color: var(--fg-2); }
+.log .k-pit { color: var(--yellow); } .log .k-flag { color: var(--fg); } .log .k-sc { color: var(--yellow); font-weight: 600; } .log .k-red { color: var(--red); font-weight: 600; } .log .k-std { color: var(--red-fg); } .log .k-oth { color: var(--fg-2); } .log .k-fin { color: #fff; font-weight: 600; }
 .empty { color: var(--fg-4); font-size: 14px; padding: 8px 0; }
 
 /* Tower */
 aside.tower { flex: 1 1 400px; min-width: 0; padding: 16px; gap: 6px; }
 .towerhead { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 4px 8px 8px; flex-wrap: wrap; }
-.trow { display: grid; grid-template-columns: 26px 4px minmax(0, 1fr) 80px 60px 26px; gap: 10px; align-items: center; }
+.trow { display: grid; grid-template-columns: 26px 4px minmax(0, 1fr) 80px 64px 26px; gap: 10px; align-items: center; }
 .thead { padding: 0 10px 6px; color: var(--fg-3); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; }
 .tbody { position: relative; }
 .tbtn { position: absolute; left: 0; right: 0; height: 44px; padding: 0 10px; border: 1px solid transparent; border-radius: 8px; background: var(--panel); color: var(--fg); text-align: left; cursor: pointer; transition: transform .45s cubic-bezier(.3,.7,.2,1), background .15s; }
 .tbtn:hover { background: #191C22; }
 .tbtn[aria-pressed="true"] { background: var(--sel); border-color: var(--line-3); }
+.tbtn.out { opacity: .5; }
 .tbtn .pos { font: 700 15px var(--mono); }
 .tbtn .bar { height: 22px; border-radius: 2px; }
 .tbtn .who { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
 .tbtn .code { font: 700 15px var(--mono); }
 .tbtn .team { color: var(--fg-3); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tbtn .badge { margin-left: auto; font: 700 11px var(--mono); white-space: nowrap; }
-.tbtn .gap, .tbtn .int { text-align: right; font: 500 13px var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tbtn .gap, .tbtn .int { text-align: right; font: 500 13px var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; }
 .tbtn .int { color: var(--fg-2); }
-.tyre { justify-self: center; width: 22px; height: 22px; border-radius: 50%; border: 2px solid; display: grid; place-items: center; font: 700 10px var(--mono); }
+.tyre { justify-self: center; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--fg-5); color: var(--fg-4); display: grid; place-items: center; font: 700 10px var(--mono); }
 .flash-up { animation: fu .9s; } .flash-down { animation: fd .9s; }
 @keyframes fu { from { background: #14304A; } } @keyframes fd { from { background: #3A2614; } }
 
@@ -155,27 +173,29 @@ aside.tower { flex: 1 1 400px; min-width: 0; padding: 16px; gap: 6px; }
 .chip.next { background: var(--red-bg); color: var(--red-fg); }
 .chip.up { background: #15202C; color: var(--up); }
 .chip.sprint { background: var(--yellow-bg); color: var(--yellow); }
-.rnd.done .gp { color: var(--fg-3); }
-.detail { padding: 4px 12px 14px 58px; display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
-.detail .tile .v { font-size: 16px; }
-.detail .act { grid-column: 1 / -1; display: flex; gap: 8px; flex-wrap: wrap; }
-.search { min-height: 40px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line-2); background: var(--bar); color: var(--fg); font: 500 14px var(--body); width: 100%; }
-.search::placeholder { color: var(--fg-4); }
-.srow { display: grid; grid-template-columns: 28px 4px minmax(0,1fr) 54px; gap: 10px; align-items: center; width: 100%; min-height: 48px; padding: 6px 10px; border: none; border-radius: 8px; background: transparent; cursor: pointer; text-align: left; }
-.srow:hover { background: #191C22; }
+.chip.cxl { background: #1A1D23; color: var(--red-fg); }
+.rnd.done .gp, .rnd.cxl .gp { color: var(--fg-3); }
+.rnd.cxl .gp > span:first-child { text-decoration: line-through; }
+.detail { padding: 4px 12px 14px 58px; }
+.srow { display: grid; grid-template-columns: 28px 4px minmax(0,1fr) 58px; gap: 10px; align-items: center; width: 100%; min-height: 48px; padding: 6px 10px; border: none; border-radius: 8px; background: transparent; text-align: left; }
+button.srow { cursor: pointer; } button.srow:hover { background: #191C22; }
 .srow .p { font: 700 14px var(--mono); }
 .srow .nmx { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
 .srow .nmx span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .srow .nmx small { color: var(--fg-3); font-size: 12px; }
 .srow .pts { text-align: right; font: 700 15px var(--mono); }
+.srow .chg { font: 700 11px var(--mono); margin-left: 6px; }
 .meter { height: 4px; background: var(--bar); border-radius: 2px; overflow: hidden; }
 .meter i { display: block; height: 100%; border-radius: 2px; }
-.note { margin: 0; color: var(--fg-3); font-size: 13px; }
+.search { min-height: 40px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line-2); background: var(--bar); color: var(--fg); font: 500 14px var(--body); width: 100%; }
+.search::placeholder { color: var(--fg-4); }
 .toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 20px); opacity: 0; background: var(--fg); color: var(--bg); padding: 10px 16px; border-radius: 10px; font-weight: 600; font-size: 14px; transition: .25s; pointer-events: none; z-index: 50; max-width: calc(100% - 32px); }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
+footer { max-width: 1360px; margin: 0 auto; padding: 0 16px 32px; color: var(--fg-4); font-size: 13px; }
+footer a { color: var(--fg-3); }
 
 @media (max-width: 560px) {
-  .trow { grid-template-columns: 22px 4px minmax(0, 1fr) 70px 26px; gap: 8px; }
+  .trow { grid-template-columns: 22px 4px minmax(0, 1fr) 72px 26px; gap: 8px; }
   .trow .int, .thead .int, .tbtn .team { display: none; }
   .hright .where { display: none; }
   .rnd > button { grid-template-columns: 28px minmax(0,1fr) auto; }
@@ -198,7 +218,7 @@ aside.tower { flex: 1 1 400px; min-width: 0; padding: 16px; gap: 6px; }
       <a href="#calendar" data-route="calendar">Calendar &amp; standings</a>
     </nav>
     <div class="hright">
-      <span class="where">Round 18 · Singapore Grand Prix · Marina Bay</span>
+      <span class="where" id="where">2026 season</span>
       <div class="swatches" role="group" aria-label="Accent colour" id="swatches"></div>
       <span class="hello">Hello</span>
     </div>
@@ -208,49 +228,62 @@ aside.tower { flex: 1 1 400px; min-width: 0; padding: 16px; gap: 6px; }
 <!-- ============ LIVE ============ -->
 <main id="page-live">
   <section class="topline">
-    <div style="display:flex;flex-direction:column;gap:6px">
+    <div style="display:flex;flex-direction:column;gap:10px;min-width:0">
       <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <span class="pill" style="background:var(--red-bg);color:var(--red-fg)"><span class="dot live-dot"></span>LIVE</span>
-        <span class="pill" style="background:var(--yellow-bg);color:var(--yellow)">SIMULATED FEED</span>
+        <span class="pill replay" id="modePill"><span class="dot"></span><span id="modeText">REPLAY</span></span>
+        <span class="pill src">OPENF1 DATA</span>
       </div>
-      <h1>Singapore GP · Race</h1>
+      <h1 id="title">Loading…</h1>
+      <div class="picker">
+        <select class="select" id="pickMeeting" aria-label="Grand Prix"></select>
+        <select class="select" id="pickSession" aria-label="Session"></select>
+        <button class="btn" id="goLive" hidden><span class="dot" style="color:var(--accent)"></span>Watch live</button>
+      </div>
     </div>
     <div class="stats">
-      <div class="stat"><div class="label">Lap</div><div class="v"><span id="lap">1</span><span style="color:var(--fg-4);font-size:16px">/62</span></div></div>
-      <div class="stat"><div class="label">Race time</div><div class="v" id="clock">0:00:00</div></div>
-      <div class="stat"><div class="label">Track status</div><div class="v disp"><span class="flagsq" id="flagsq"></span><span id="flag">Green</span></div></div>
+      <div class="stat"><div class="label">Lap</div><div class="v"><span id="lap">–</span><span style="color:var(--fg-4);font-size:16px" id="lapTotal"></span></div></div>
+      <div class="stat"><div class="label">Session time</div><div class="v" id="clock">–</div></div>
+      <div class="stat"><div class="label">Track status</div><div class="v disp"><span class="flagsq" id="flagsq" style="background:var(--fg-5)"></span><span id="flag">–</span></div></div>
+      <div class="stat"><div class="label">Weather</div><div class="v sm" id="wx">–</div></div>
     </div>
   </section>
+
+  <div class="notice" id="notice" hidden><p id="noticeText"></p><button class="btn sm" id="noticeBtn" hidden>Try again</button></div>
 
   <section class="grid-live">
     <div class="col-main">
       <div class="card">
         <div class="maphead">
-          <div>
-            <h2 style="font-size:24px">Marina Bay Street Circuit</h2>
-            <div class="muted" style="font-size:14px">4.927 km · 19 corners · night race · schematic layout</div>
+          <div style="min-width:0">
+            <h2 style="font-size:24px" id="circuit">Circuit</h2>
+            <div class="muted" style="font-size:14px" id="circuitSub">Track shape drawn from real car GPS data</div>
           </div>
-          <div class="controls">
-            <button class="btn" id="play" style="min-width:84px;justify-content:center">Pause</button>
+          <div class="controls" id="replayControls">
+            <button class="btn" id="play" style="min-width:84px;justify-content:center">Play</button>
             <div class="seg" role="group" aria-label="Playback speed" id="speeds"></div>
-            <button class="btn warn" id="sc" aria-pressed="false" title="Deploy or recall the safety car">Safety car</button>
-            <button class="btn ghost" id="restart">Restart</button>
+            <button class="btn ghost" id="back30" aria-label="Back 30 seconds">−30s</button>
+            <button class="btn ghost" id="fwd30" aria-label="Forward 30 seconds">+30s</button>
           </div>
         </div>
         <div class="map" id="map">
-          <svg viewBox="0 0 640 420" id="mapsvg" role="img" aria-label="Track map with car positions">
-            <polygon id="trk1" fill="none" stroke="#262A33" stroke-width="18" stroke-linejoin="round"/>
-            <polygon id="trk2" fill="none" stroke="#3B414D" stroke-width="1.5" stroke-linejoin="round" stroke-dasharray="6 6"/>
-            <rect x="466" y="318" width="6" height="24" fill="#EEF0F3" transform="rotate(-8 469 330)"/>
-            <text x="480" y="362" fill="#6E7582" font-family="JetBrains Mono, monospace" font-size="11">START / FINISH</text>
-            <text x="250" y="400" fill="#4E5562" font-family="Barlow, sans-serif" font-size="12">Marina Bay</text>
+          <svg id="mapsvg" role="img" aria-label="Track map with car positions">
+            <polyline id="trk1" fill="none" stroke="#262A33" stroke-linejoin="round" stroke-linecap="round"/>
+            <polyline id="trk2" fill="none" stroke="#3B414D" stroke-linejoin="round" stroke-linecap="round"/>
+            <rect id="sf" fill="#EEF0F3" width="0" height="0"/>
             <g id="cars"></g>
           </svg>
           <div class="banner" id="banner" hidden></div>
+          <div class="mapmsg" id="mapMsg"><div>Loading session…</div></div>
+          <div class="locwait" id="locWait" hidden>Loading car positions…</div>
+        </div>
+        <div class="timeline" id="timeline">
+          <input type="range" id="scrub" min="0" max="1000" step="1" value="0" aria-label="Replay position">
+          <span class="tl" id="tlLabel">–</span>
+          <button class="btn ghost sm" id="restart">Restart</button>
         </div>
         <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 16px">
-          <p class="note">Positions are simulated so the prototype moves. Click any car on the map or in the tower to follow it.</p>
-          <span class="kbd"><b>Space</b> play/pause · <b>↑</b><b>↓</b> switch driver · <b>R</b> restart</span>
+          <p class="note" id="mapNote">Click any car on the map or in the timing tower to follow it.</p>
+          <span class="kbd"><b>Space</b> play/pause · <b>←</b><b>→</b> 30s · <b>↑</b><b>↓</b> driver</span>
         </div>
       </div>
 
@@ -260,19 +293,19 @@ aside.tower { flex: 1 1 400px; min-width: 0; padding: 16px; gap: 6px; }
             <div class="stripe" id="selStripe"></div>
             <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
               <span class="label">Following</span>
-              <span class="nm" id="selName">—</span>
+              <span class="nm" id="selName">–</span>
               <span style="color:var(--fg-2);font-size:14px" id="selTeam"></span>
             </div>
           </div>
           <div class="tiles">
             <div class="tile"><div class="k">Position</div><div class="v" id="selPos">–</div></div>
-            <div class="tile"><div class="k">Gap</div><div class="v sm" id="selGap">–</div></div>
+            <div class="tile"><div class="k" id="selGapK">Gap</div><div class="v sm" id="selGap">–</div></div>
             <div class="tile"><div class="k">Started</div><div class="v" id="selGrid">–</div></div>
             <div class="tile"><div class="k">Last lap</div><div class="v sm" id="selLast">–</div></div>
             <div class="tile"><div class="k">Best lap</div><div class="v sm" id="selBest">–</div></div>
             <div class="tile"><div class="k">Tyre · age</div><div class="v sm" id="selTyre">–</div></div>
           </div>
-          <div style="color:var(--fg-2);font-size:14px" id="selChamp"></div>
+          <div style="color:var(--fg-2);font-size:14px" id="selExtra"></div>
           <div class="followbtns">
             <button class="btn" id="prevDrv" aria-label="Follow car ahead">▲ Car ahead</button>
             <button class="btn" id="nextDrv" aria-label="Follow car behind">▼ Car behind</button>
@@ -284,15 +317,16 @@ aside.tower { flex: 1 1 400px; min-width: 0; padding: 16px; gap: 6px; }
             <h2 style="font-size:22px">Race control</h2>
             <div class="seg text" role="group" aria-label="Filter messages" id="logFilter">
               <button data-f="all" aria-pressed="true">All</button>
+              <button data-f="flag" aria-pressed="false">Flags</button>
               <button data-f="pit" aria-pressed="false">Pits</button>
-              <button data-f="ov" aria-pressed="false">Moves</button>
+              <button data-f="std" aria-pressed="false">Stewards</button>
             </div>
           </div>
           <ul class="log" id="log"></ul>
         </div>
 
         <div class="card">
-          <h2 style="font-size:22px">Weekend schedule <span class="muted" style="font-weight:600;font-size:16px">· Singapore time</span></h2>
+          <h2 style="font-size:22px">Weekend schedule <span class="muted" style="font-weight:600;font-size:16px">· track time</span></h2>
           <div class="sched" id="sched"></div>
         </div>
       </div>
@@ -303,7 +337,7 @@ aside.tower { flex: 1 1 400px; min-width: 0; padding: 16px; gap: 6px; }
         <h2 style="font-size:24px">Timing tower</h2>
         <span class="muted" style="font-size:13px">Tap a driver to follow</span>
       </div>
-      <div class="trow thead"><span>Pos</span><span></span><span>Driver</span><span style="text-align:right">Gap</span><span class="int" style="text-align:right">Int</span><span style="text-align:center">Tyre</span></div>
+      <div class="trow thead"><span>Pos</span><span></span><span>Driver</span><span style="text-align:right" id="colA">Gap</span><span class="int" style="text-align:right" id="colB">Int</span><span style="text-align:center">Tyre</span></div>
       <div class="tbody" id="tower"></div>
     </aside>
   </section>
@@ -314,25 +348,25 @@ aside.tower { flex: 1 1 400px; min-width: 0; padding: 16px; gap: 6px; }
   <section class="cal-top">
     <div class="card hero-next">
       <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <span class="pill" style="background:var(--red-bg);color:var(--red-fg)"><span class="dot"></span><span id="nextTag">THIS WEEKEND</span></span>
-        <span class="pill chip sprint">SPRINT WEEKEND</span>
+        <span class="pill live" id="nextPill"><span class="dot"></span><span id="nextTag">NEXT SESSION</span></span>
+        <span class="pill chip sprint" id="nextSprint" hidden>SPRINT WEEKEND</span>
       </div>
-      <h1 id="nextName">Singapore Grand Prix</h1>
-      <div class="muted" id="nextSub">Marina Bay Street Circuit · Sun 11 Oct · 20:00 local</div>
-      <div class="count" id="countdown" aria-live="off">
+      <h1 id="nextName">Loading calendar…</h1>
+      <div class="muted" id="nextSub"></div>
+      <div class="count" id="countdown">
         <div><b id="cdD">0</b><span class="label">Days</span></div>
         <div><b id="cdH">00</b><span class="label">Hours</span></div>
         <div><b id="cdM">00</b><span class="label">Min</span></div>
         <div><b id="cdS">00</b><span class="label">Sec</span></div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <a class="btn" href="#live" style="text-decoration:none">Open live tracker</a>
-        <button class="btn ghost" id="copyRace">Copy race start time</button>
+        <a class="btn" href="#live">Open live tracker</a>
+        <button class="btn ghost" id="copyNext">Copy session time</button>
       </div>
     </div>
     <div class="card season">
       <h2 style="font-size:22px">2026 season</h2>
-      <div style="display:flex;justify-content:space-between" class="mono"><span id="seasonDone">0 of 24 rounds</span><span id="seasonPct" class="muted">0%</span></div>
+      <div style="display:flex;justify-content:space-between" class="mono"><span id="seasonDone">–</span><span id="seasonPct" class="muted"></span></div>
       <div class="progress"><i id="seasonBar" style="width:0"></i></div>
       <div class="tiles" style="grid-template-columns:repeat(2,minmax(0,1fr))">
         <div class="tile"><div class="k">Leader</div><div class="v sm" id="ldr">–</div></div>
@@ -354,7 +388,7 @@ aside.tower { flex: 1 1 400px; min-width: 0; padding: 16px; gap: 6px; }
           <button data-f="sprint" aria-pressed="false">Sprints</button>
         </div>
       </div>
-      <div class="rounds" id="rounds"></div>
+      <div class="rounds" id="rounds"><div class="empty">Loading…</div></div>
     </div>
 
     <div class="card stand">
@@ -366,502 +400,750 @@ aside.tower { flex: 1 1 400px; min-width: 0; padding: 16px; gap: 6px; }
         </div>
       </div>
       <input class="search" id="standSearch" type="search" placeholder="Search driver or team" aria-label="Search standings">
-      <div id="standList" style="display:flex;flex-direction:column;gap:2px"></div>
-      <p class="note">Sample standings for this prototype. Select a driver to follow them in the live tracker.</p>
+      <div id="standList" style="display:flex;flex-direction:column;gap:2px"><div class="empty">Loading standings…</div></div>
+      <p class="note" id="standNote"></p>
     </div>
   </section>
 </main>
 
+<footer>Timing data from <a href="https://openf1.org" target="_blank" rel="noopener">OpenF1</a>. Unofficial fan project, not associated with Formula 1.</footer>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
 (() => {
 'use strict';
 const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const store = {
   get(k, d) { try { const v = localStorage.getItem('pitwall:' + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
   set(k, v) { try { localStorage.setItem('pitwall:' + k, JSON.stringify(v)); } catch (e) {} }
 };
 let toastT;
-function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 1800); }
-
-/* ---------- Data ---------- */
-const TEAMS = {
-  merc: { name: 'Mercedes', c: '#27F4D2' }, fer: { name: 'Ferrari', c: '#E8002D' },
-  mcl: { name: 'McLaren', c: '#FF8000' }, rbr: { name: 'Red Bull Racing', c: '#3671C6' },
-  rb: { name: 'Racing Bulls', c: '#6C98FF' }, alp: { name: 'Alpine', c: '#FF87BC' },
-  haas: { name: 'Haas', c: '#B6BABD' }, audi: { name: 'Audi', c: '#BB0A30' },
-  ast: { name: 'Aston Martin', c: '#229971' }, wil: { name: 'Williams', c: '#64C4FF' },
-  cad: { name: 'Cadillac', c: '#C9A961' }
-};
-const DRIVERS = [
-  ['ANT','Kimi Antonelli','merc',320],['RUS','George Russell','merc',236],['HAM','Lewis Hamilton','fer',214],
-  ['LEC','Charles Leclerc','fer',191],['NOR','Lando Norris','mcl',188],['VER','Max Verstappen','rbr',188],
-  ['PIA','Oscar Piastri','mcl',128],['HAD','Isack Hadjar','rbr',96],['LAW','Liam Lawson','rb',65],
-  ['GAS','Pierre Gasly','alp',41],['LIN','Arvid Lindblad','rb',38],['COL','Franco Colapinto','alp',27],
-  ['BEA','Oliver Bearman','haas',20],['BOR','Gabriel Bortoleto','audi',10],['HUL','Nico Hulkenberg','audi',7],
-  ['OCO','Esteban Ocon','haas',7],['ALO','Fernando Alonso','ast',7],['SAI','Carlos Sainz','wil',7],
-  ['ALB','Alexander Albon','wil',5],['STR','Lance Stroll','ast',0],['BOT','Valtteri Bottas','cad',0],
-  ['PER','Sergio Perez','cad',0]
-];
-DRIVERS.forEach((d, i) => { d.champPos = i + 1; });
-const DMAP = Object.fromEntries(DRIVERS.map((d) => [d[0], d]));
-
-// [name, circuit, race date (UTC ISO of local race day), km, laps, sprint, city]
-const ROUNDS = [
-  ['Australian Grand Prix','Albert Park Circuit','2026-03-08',5.278,58,false,'Melbourne'],
-  ['Chinese Grand Prix','Shanghai International Circuit','2026-03-15',5.451,56,true,'Shanghai'],
-  ['Japanese Grand Prix','Suzuka Circuit','2026-03-29',5.807,53,false,'Suzuka'],
-  ['Bahrain Grand Prix','Bahrain International Circuit','2026-04-12',5.412,57,false,'Sakhir'],
-  ['Saudi Arabian Grand Prix','Jeddah Corniche Circuit','2026-04-19',6.174,50,false,'Jeddah'],
-  ['Miami Grand Prix','Miami International Autodrome','2026-05-03',5.412,57,true,'Miami'],
-  ['Canadian Grand Prix','Circuit Gilles Villeneuve','2026-05-24',4.361,70,true,'Montréal'],
-  ['Monaco Grand Prix','Circuit de Monaco','2026-06-07',3.337,78,false,'Monte Carlo'],
-  ['Barcelona-Catalunya Grand Prix','Circuit de Barcelona-Catalunya','2026-06-14',4.657,66,false,'Barcelona'],
-  ['Austrian Grand Prix','Red Bull Ring','2026-06-28',4.318,71,false,'Spielberg'],
-  ['British Grand Prix','Silverstone Circuit','2026-07-05',5.891,52,true,'Silverstone'],
-  ['Belgian Grand Prix','Circuit de Spa-Francorchamps','2026-07-19',7.004,44,false,'Spa'],
-  ['Hungarian Grand Prix','Hungaroring','2026-07-26',4.381,70,false,'Budapest'],
-  ['Dutch Grand Prix','Circuit Zandvoort','2026-08-23',4.259,72,true,'Zandvoort'],
-  ['Italian Grand Prix','Autodromo Nazionale Monza','2026-09-06',5.793,53,false,'Monza'],
-  ['Spanish Grand Prix','Madring','2026-09-13',5.474,57,false,'Madrid'],
-  ['Azerbaijan Grand Prix','Baku City Circuit','2026-09-26',6.003,51,false,'Baku'],
-  ['Singapore Grand Prix','Marina Bay Street Circuit','2026-10-11',4.927,62,true,'Singapore'],
-  ['United States Grand Prix','Circuit of the Americas','2026-10-25',5.513,56,false,'Austin'],
-  ['Mexico City Grand Prix','Autódromo Hermanos Rodríguez','2026-11-01',4.304,71,false,'Mexico City'],
-  ['São Paulo Grand Prix','Interlagos','2026-11-08',4.309,71,false,'São Paulo'],
-  ['Las Vegas Grand Prix','Las Vegas Strip Circuit','2026-11-21',6.201,50,false,'Las Vegas'],
-  ['Qatar Grand Prix','Lusail International Circuit','2026-11-29',5.419,57,false,'Lusail'],
-  ['Abu Dhabi Grand Prix','Yas Marina Circuit','2026-12-06',5.281,58,false,'Abu Dhabi']
-];
-const SG_RACE = Date.parse('2026-10-11T12:00:00Z'); // 20:00 SGT
-const SCHEDULE = [
-  ['Practice 1','2026-10-09T08:30:00Z','Fri 9 Oct · 16:30'],
-  ['Sprint Qualifying','2026-10-09T12:30:00Z','Fri 9 Oct · 20:30'],
-  ['Sprint','2026-10-10T09:00:00Z','Sat 10 Oct · 17:00'],
-  ['Qualifying','2026-10-10T13:00:00Z','Sat 10 Oct · 21:00'],
-  ['Race · 62 laps','2026-10-11T12:00:00Z','Sun 11 Oct · 20:00']
-];
+function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2000); }
+const T = (s) => (s ? Date.parse(String(s).replace(/(\.\d{3})\d+/, '$1')) : NaN);
+const iso = (ms) => new Date(ms).toISOString();
+function lastIdx(arr, t) { let lo = 0, hi = arr.length - 1, r = -1; while (lo <= hi) { const m = (lo + hi) >> 1; if (arr[m].t <= t) { r = m; lo = m + 1; } else hi = m - 1; } return r; }
+function fmtLap(s) { if (s == null || !isFinite(s)) return '–'; const m = Math.floor(s / 60); return m ? m + ':' + (s - m * 60).toFixed(3).padStart(6, '0') : s.toFixed(3); }
+function fmtClock(ms) { if (!isFinite(ms)) return '–'; const neg = ms < 0; let s = Math.floor(Math.abs(ms) / 1000); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60); s %= 60; return (neg ? '−' : '') + h + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0'); }
+function trackTime(ms, off) { const m = /^(-?)(\d+):(\d+)/.exec(off || '00:00'); const mins = m ? (m[1] ? -1 : 1) * (+m[2] * 60 + +m[3]) : 0; return new Date(ms + mins * 60000); }
+const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+function fmtDay(ms, off) { const d = trackTime(ms, off); return DAYS[d.getUTCDay()] + ' ' + d.getUTCDate() + ' ' + MONTHS[d.getUTCMonth()]; }
+function fmtTrack(ms, off) { const d = trackTime(ms, off); return fmtDay(ms, off) + ' · ' + String(d.getUTCHours()).padStart(2, '0') + ':' + String(d.getUTCMinutes()).padStart(2, '0'); }
+const titleCase = (n) => n.replace(/\b([A-Z])([A-Z]+)\b/g, (m, a, b) => a + b.toLowerCase());
 
 /* ---------- Accent ---------- */
-const ACCENTS = ['#FF3B30','#F5C46B','#27F4D2','#6C98FF'];
-let accent = store.get('accent', ACCENTS[0]);
-if (!ACCENTS.includes(accent)) accent = ACCENTS[0];
-function applyAccent() {
-  document.documentElement.style.setProperty('--accent', accent);
-  $('swatches').querySelectorAll('.swatch').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.c === accent)));
-}
+const ACCENTS = ['#FF3B30', '#F5C46B', '#27F4D2', '#6C98FF'];
+let accent = store.get('accent', ACCENTS[0]); if (!ACCENTS.includes(accent)) accent = ACCENTS[0];
 $('swatches').innerHTML = ACCENTS.map((c) => `<button class="swatch" data-c="${c}" style="background:${c}" aria-label="Accent ${c}"></button>`).join('');
+function applyAccent() { document.documentElement.style.setProperty('--accent', accent); $('swatches').querySelectorAll('.swatch').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.c === accent))); }
 $('swatches').addEventListener('click', (e) => { const b = e.target.closest('.swatch'); if (!b) return; accent = b.dataset.c; store.set('accent', accent); applyAccent(); });
 applyAccent();
 
-/* ---------- Simulation ---------- */
-const LAPS = 62, BASE = 98.0, PIT_SLOW = 0.4, PIT_TIME = 35;
-const TRACK = [[470,330],[540,320],[585,285],[595,235],[575,200],[520,190],[490,160],[455,150],[420,118],[360,100],[300,105],[260,78],[200,70],[150,88],[110,80],[70,105],[60,150],[90,175],[85,215],[55,250],[60,300],[100,330],[170,340],[220,320],[280,335],[340,355],[400,348]];
-const seg = []; let total = 0;
-TRACK.forEach((a, i) => { const b = TRACK[(i + 1) % TRACK.length]; const l = Math.hypot(b[0]-a[0], b[1]-a[1]); seg.push({ a, b, l, start: total }); total += l; });
-const ptsStr = TRACK.map((p) => p.join(',')).join(' ');
-$('trk1').setAttribute('points', ptsStr); $('trk2').setAttribute('points', ptsStr);
-function pointAt(frac) {
-  let f = frac % 1; if (f < 0) f += 1; const d = f * total;
-  for (const s of seg) if (d <= s.start + s.l) { const k = (d - s.start) / s.l; return [s.a[0] + (s.b[0]-s.a[0]) * k, s.a[1] + (s.b[1]-s.a[1]) * k]; }
-  return TRACK[0];
-}
-const TYRE_COL = { S: '#FF5A4F', M: '#F5C84B', H: '#E8EAED' };
-const TYRE_NAME = { S: 'Soft', M: 'Medium', H: 'Hard' };
-
-const S = { playing: true, speed: store.get('speed', 5), selected: store.get('selected', 'ANT'), sc: false, scLaps: 0, logFilter: 'all' };
-if (![1,5,20,60].includes(S.speed)) S.speed = 5;
-if (!DMAP[S.selected]) S.selected = 'ANT';
-let R; // race state
-
-function rnd(i, salt) { const s = Math.sin((i + 1) * 12.9898 + salt * 78.233) * 43758.5453; return s - Math.floor(s); }
-function reset() {
-  const tyres = ['M','H','S','M','H'];
-  R = { t: 0, leaderDoneAt: null, finishCount: 0, fastest: null, log: [], lastOrder: null, pairT: {}, scEnd: null };
-  R.cars = DRIVERS.map((d, i) => {
-    const r = rnd(i, 0);
-    const start = tyres[(i * 7 + 3) % 5];
-    return {
-      code: d[0], name: d[1], team: d[2], pts: d[3], champPos: d.champPos, grid: i + 1,
-      p: -i * 0.0016, lapTime: BASE + i * 0.11 + (r - 0.5) * 0.35, phase: r * 6.28,
-      tyre: start, tyreLap: 0, pitLap: 16 + Math.floor(rnd(i, 1) * 18), pitted: false, pitLeft: 0,
-      next: start === 'H' ? 'M' : 'H',
-      fin: null, finGap: null, lapsDown: 0, lapStart: 0, last: null, best: null, flash: null
-    };
-  });
-  S.sc = false; $('sc').setAttribute('aria-pressed', 'false');
-  addLog(0, 'Lights out in Singapore. Race start.', 'sc');
-}
-function addLog(lap, text, kind) { R.log.unshift({ lap, text, kind }); if (R.log.length > 120) R.log.pop(); logDirty = true; }
-function fmtLap(s) { if (s == null) return '–'; const m = Math.floor(s / 60); return m + ':' + (s - m * 60).toFixed(3).padStart(6, '0'); }
-
-function step(dt) {
-  if (R.finishCount >= R.cars.length) return;
-  R.t += dt;
-  const running = R.cars.filter((c) => c.fin === null).sort((a, b) => b.p - a.p);
-  running.forEach((c, idx) => {
-    let pace = 1 + 0.012 * Math.sin(R.t * 0.045 + c.phase) + (Math.random() - 0.5) * 0.008;
-    pace *= 1 + Math.max(0, c.p - c.tyreLap - 18) * 0.0009; // tyre wear
-    let mult = 1 / pace;
-    if (S.sc) {
-      mult = 0.7;
-      const ahead = running[idx - 1];
-      if (ahead && ahead.p - c.p > 0.008) mult = 0.98; // bunch up behind the safety car
+/* ---------- OpenF1 client ---------- */
+// Free tier: historical data only, 3 req/s and 30 req/min per visitor. Live data goes through /api/openf1 (Vercel function holding the key).
+const API = 'https://api.openf1.org/v1';
+const PROXY = '/api/openf1';
+const stamps = []; let lastReq = 0; let chain = Promise.resolve();
+function slot() {
+  const p = chain.then(async () => {
+    for (;;) {
+      const now = Date.now();
+      while (stamps.length && now - stamps[0] > 60000) stamps.shift();
+      const wait = Math.max(0, lastReq + 400 - now, stamps.length >= 27 ? stamps[0] + 60050 - now : 0);
+      if (wait <= 0) break;
+      await sleep(wait);
     }
-    if (c.pitLeft > 0) { mult *= PIT_SLOW; c.pitLeft -= dt; if (c.pitLeft <= 0) { c.pitLeft = 0; c.tyre = c.next; c.tyreLap = c.p; } }
-    const prev = c.p;
-    c.p += (dt / c.lapTime) * mult;
-    const lapNo = Math.floor(c.p);
-    if (lapNo > Math.floor(prev) && prev >= 0) {
-      const lt = R.t - c.lapStart; c.lapStart = R.t;
-      if (lapNo >= 2) {
-        c.last = lt;
-        if (c.best === null || lt < c.best) c.best = lt;
-        if (!S.sc && c.pitLeft === 0 && (R.fastest === null || lt < R.fastest.t)) {
-          const first = R.fastest === null; R.fastest = { code: c.code, t: lt };
-          if (!first) addLog(lapNo, `${c.code} sets fastest lap · ${fmtLap(lt)}`, 'fl');
-        }
-      }
-      if (!c.pitted && lapNo === c.pitLap && lapNo < LAPS) {
-        c.pitted = true; c.pitLeft = PIT_TIME;
-        addLog(lapNo, `${c.code} pits · ${TYRE_NAME[c.tyre]} → ${TYRE_NAME[c.next]}`, 'pit');
-      }
-    } else if (prev < 0 && c.p >= 0) c.lapStart = R.t;
-    if (c.p >= LAPS) {
-      if (R.leaderDoneAt === null) { R.leaderDoneAt = R.t; addLog(LAPS, `CHEQUERED FLAG · ${c.name} wins the Singapore Grand Prix`, 'fin'); }
-      c.fin = R.finishCount++; c.finGap = R.t - R.leaderDoneAt; c.p = LAPS;
-    } else if (R.leaderDoneAt !== null && lapNo > Math.floor(prev)) {
-      c.fin = R.finishCount++; c.lapsDown = LAPS - lapNo;
-    }
+    lastReq = Date.now(); stamps.push(lastReq);
   });
-  if (S.sc && R.scEnd !== null && leaderLap() >= R.scEnd) toggleSC(false);
+  chain = p.catch(() => {});
+  return p;
 }
-function key(c) { return c.fin !== null ? LAPS - c.lapsDown + 1 - c.fin * 0.001 : c.p; }
-function ordered() { return R.cars.slice().sort((a, b) => key(b) - key(a)); }
-function leaderLap() { return Math.floor(ordered()[0].p) + 1; }
-function fmtGap(lead, c) {
-  if (c.fin !== null && lead.fin !== null) return c.lapsDown > 0 ? '+' + c.lapsDown + ' LAP' : '+' + c.finGap.toFixed(3);
-  const diff = lead.p - c.p; if (diff >= 1) return '+' + Math.floor(diff) + ' LAP';
-  return '+' + (diff * BASE).toFixed(3);
+async function api(ep, qs, opts = {}) {
+  const url = opts.proxy ? `${PROXY}?ep=${ep}&${qs}` : `${API}/${ep}?${qs}`;
+  for (let attempt = 0; attempt < 4; attempt++) {
+    if (!opts.proxy) await slot();
+    let r;
+    try { r = await fetch(url); } catch (e) { await sleep(1500 * (attempt + 1)); continue; }
+    if (r.status === 404) return [];
+    if (r.status === 429) { await sleep(5000 * (attempt + 1)); continue; }
+    if (r.status >= 500) { await sleep(1500 * (attempt + 1)); continue; }
+    if (r.status === 401 || r.status === 403) throw new Error('OpenF1 has not released this session yet. Free data opens shortly after a session ends.');
+    if (!r.ok) throw new Error(`OpenF1 returned an error (${r.status}) for ${ep}.`);
+    const j = await r.json();
+    return Array.isArray(j) ? j : [];
+  }
+  throw new Error('OpenF1 is not responding right now. Try again in a minute.');
 }
-function fmtInt(ahead, c) {
-  const diff = ahead.p - c.p; if (diff >= 1) return '+1 LAP';
-  if (c.fin !== null && ahead.fin !== null && !c.lapsDown && !ahead.lapsDown) return '+' + (c.finGap - ahead.finGap).toFixed(1);
-  return '+' + (diff * BASE).toFixed(1);
+let LIVE_KEY = false;
+async function checkProxy() {
+  try { const r = await fetch(PROXY + '?status=1', { cache: 'no-store' }); if (!r.ok) return false; const j = await r.json(); return !!j.live; } catch (e) { return false; }
 }
 
-/* ---------- Live UI ---------- */
-const ROW_H = 50;
-const towerEl = $('tower');
-towerEl.style.height = (DRIVERS.length * ROW_H - 6) + 'px';
-const rowEls = {}, carEls = {};
+/* ---------- Season data ---------- */
+let MEETINGS = [], SESSIONS = [];
+const isTesting = (m) => /testing/i.test(m.meeting_name || '');
+function sessionDone(s, now = Date.now()) { return !s.is_cancelled && now > T(s.date_end) + 30 * 60000; }
+function sessionLiveWindow(s, now = Date.now()) { return !s.is_cancelled && now >= T(s.date_start) - 30 * 60000 && now <= T(s.date_end) + 30 * 60000; }
+function meetingOf(s) { return MEETINGS.find((m) => m.meeting_key === s.meeting_key); }
+function sessionsOf(mk) { return SESSIONS.filter((s) => s.meeting_key === mk).sort((a, b) => T(a.date_start) - T(b.date_start)); }
+function roundNo(m) { let n = 0; for (const x of MEETINGS) { if (isTesting(x) || x.is_cancelled) continue; n++; if (x.meeting_key === m.meeting_key) return n; } return null; }
+const shortGP = (name) => (name || '').replace('Grand Prix', 'GP');
+
+/* ---------- Session store ---------- */
+let D = null; let gen = 0;
+function newStore(s, live) {
+  return { s, key: s.session_key, live, isRace: s.session_type === 'Race', m: meetingOf(s) || {},
+    drivers: new Map(), pos: new Map(), ints: new Map(), laps: new Map(), lapList: new Map(), stints: new Map(),
+    pits: new Map(), pitArr: [], rc: new Map(), rcArr: [], wx: [], wxSeen: new Set(), loc: new Map(), seen: new Set(),
+    result: new Map(), windows: new Map(), t0: NaN, t1: NaN, start: NaN, end: NaN, total: 0, loaded: false };
+}
+function pushSeries(map, num, item) { let a = map.get(num); if (!a) map.set(num, a = []); a.push(item); }
+const byT = (a, b) => a.t - b.t;
+function ingest(kind, rows) {
+  if (!D || !rows.length) return;
+  const touched = new Set();
+  for (const r of rows) {
+    const num = r.driver_number;
+    switch (kind) {
+      case 'drivers':
+        D.drivers.set(num, { num, code: r.name_acronym || String(num), name: r.full_name ? titleCase(r.full_name) : String(num), team: r.team_name || '', color: '#' + (r.team_colour || '888888') });
+        break;
+      case 'position': case 'intervals': case 'location': {
+        const k = kind[0] + num + r.date; if (D.seen.has(k)) break; D.seen.add(k);
+        const t = T(r.date);
+        if (kind === 'position') pushSeries(D.pos, num, { t, v: r.position });
+        else if (kind === 'intervals') pushSeries(D.ints, num, { t, gap: r.gap_to_leader, int: r.interval });
+        else pushSeries(D.loc, num, { t, x: r.x, y: r.y });
+        touched.add(kind + ':' + num);
+        break;
+      }
+      case 'laps': {
+        let m = D.laps.get(num); if (!m) D.laps.set(num, m = new Map());
+        m.set(r.lap_number, { n: r.lap_number, start: T(r.date_start), dur: r.lap_duration, pitOut: r.is_pit_out_lap });
+        touched.add('laps:' + num); break;
+      }
+      case 'stints': {
+        let m = D.stints.get(num); if (!m) D.stints.set(num, m = new Map());
+        m.set(r.stint_number, { n: r.stint_number, from: r.lap_start, to: r.lap_end, comp: r.compound, age0: r.tyre_age_at_start || 0 });
+        break;
+      }
+      case 'pit': D.pits.set(num + '|' + r.lap_number, { num, lap: r.lap_number, t: T(r.date), lane: r.lane_duration ?? r.pit_duration, stop: r.stop_duration }); touched.add('pit'); break;
+      case 'race_control': D.rc.set(r.date + '|' + r.message, { t: T(r.date), cat: r.category, flag: r.flag, scope: r.scope, msg: r.message || '', lap: r.lap_number, num }); touched.add('rc'); break;
+      case 'weather': if (!D.wxSeen.has(r.date)) { D.wxSeen.add(r.date); D.wx.push({ t: T(r.date), air: r.air_temperature, track: r.track_temperature, rain: r.rainfall }); touched.add('wx'); } break;
+      case 'session_result': D.result.set(num, r); break;
+    }
+  }
+  for (const k of touched) {
+    if (k === 'pit') D.pitArr = [...D.pits.values()].sort(byT);
+    else if (k === 'rc') D.rcArr = [...D.rc.values()].sort(byT);
+    else if (k === 'wx') D.wx.sort(byT);
+    else {
+      const [kind, n] = k.split(':'); const num = +n;
+      if (kind === 'laps') D.lapList.set(num, [...D.laps.get(num).values()].sort((a, b) => a.n - b.n));
+      else (kind === 'position' ? D.pos : kind === 'intervals' ? D.ints : D.loc).get(num).sort(byT);
+    }
+  }
+}
+function computeBounds() {
+  const rc = D.rcArr;
+  const starts = rc.filter((r) => r.cat === 'SessionStatus' && /STARTED/.test(r.msg));
+  const ends = rc.filter((r) => r.cat === 'SessionStatus' && /FINISHED|ENDS|ENDED/.test(r.msg));
+  let minLap = Infinity, maxEnd = -Infinity, maxLap = 0;
+  for (const list of D.lapList.values()) for (const L of list) {
+    if (isFinite(L.start)) minLap = Math.min(minLap, L.start);
+    if (isFinite(L.start) && L.dur) maxEnd = Math.max(maxEnd, L.start + L.dur * 1000);
+    maxLap = Math.max(maxLap, L.n);
+  }
+  D.start = starts.length ? starts[0].t : isFinite(minLap) ? minLap : T(D.s.date_start);
+  D.end = ends.length ? ends[ends.length - 1].t : isFinite(maxEnd) ? maxEnd : T(D.s.date_end);
+  D.t0 = D.start - (D.isRace ? 60000 : 0);
+  D.t1 = Math.max(D.end, isFinite(maxEnd) ? maxEnd : 0) + 90000;
+  if (D.isRace) {
+    let res = 0; for (const r of D.result.values()) if (r.position === 1 && r.number_of_laps) res = r.number_of_laps;
+    D.total = res || (D.live ? 0 : maxLap);
+  }
+}
+
+/* ---------- Track geometry ---------- */
+const VB_W = 1000, PAD = 50;
+let geo = null;
+function buildGeometry(pts) {
+  let xs = pts.map((p) => p.x), ys = pts.map((p) => p.y);
+  const w = Math.max(...xs) - Math.min(...xs), h = Math.max(...ys) - Math.min(...ys);
+  const rot = h > w * 1.15; // keep tall circuits landscape
+  const rx = (x, y) => (rot ? y : x), ry = (x, y) => (rot ? -x : y);
+  xs = pts.map((p) => rx(p.x, p.y)); ys = pts.map((p) => ry(p.x, p.y));
+  const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
+  const k = (VB_W - 2 * PAD) / Math.max(1, maxX - minX);
+  const H = (maxY - minY) * k + 2 * PAD;
+  geo = { proj: (x, y) => [(rx(x, y) - minX) * k + PAD, (maxY - ry(x, y)) * k + PAD] };
+  const vbH = Math.max(H, 480);
+  $('mapsvg').setAttribute('viewBox', `0 ${((H - vbH) / 2).toFixed(0)} ${VB_W} ${vbH.toFixed(0)}`);
+  $('map').style.aspectRatio = `${VB_W} / ${vbH.toFixed(0)}`;
+  const P = pts.map((p) => geo.proj(p.x, p.y));
+  const str = P.concat([P[0]]).map((p) => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+  for (const [id, sw, dash] of [['trk1', 26, null], ['trk2', 2, '8 8']]) { const el = $(id); el.setAttribute('points', str); el.setAttribute('stroke-width', sw); if (dash) el.setAttribute('stroke-dasharray', dash); }
+  const a = P[0], b = P[Math.min(4, P.length - 1)]; const ang = Math.atan2(b[1] - a[1], b[0] - a[0]) * 180 / Math.PI;
+  const sf = $('sf'); sf.setAttribute('x', a[0] - 3); sf.setAttribute('y', a[1] - 18); sf.setAttribute('width', 6); sf.setAttribute('height', 36); sf.setAttribute('transform', `rotate(${ang.toFixed(1)} ${a[0].toFixed(1)} ${a[1].toFixed(1)})`);
+}
+async function loadTrack(myGen, opts) {
+  // Outline = GPS trace of the fastest clean lap of the session.
+  let best = null, bestNum = null;
+  for (const [num, list] of D.lapList) for (const L of list) if (L.dur && isFinite(L.start) && !L.pitOut && L.n > 1 && (!best || L.dur < best.dur)) { best = L; bestNum = num; }
+  if (!best) return false;
+  const rows = await api('location', `session_key=${D.key}&driver_number=${bestNum}&date>=${iso(best.start)}&date<${iso(best.start + best.dur * 1000)}`, opts);
+  if (myGen !== gen) return false;
+  const pts = []; for (const r of rows) { const l = pts[pts.length - 1]; if (!l || l.x !== r.x || l.y !== r.y) pts.push({ x: r.x, y: r.y }); }
+  if (pts.length < 20) return false;
+  buildGeometry(pts); return true;
+}
+
+/* ---------- Car positions (location stream, replay) ---------- */
+const WIN = 90000; let locInflight = 0;
+function ensureWindows(t) {
+  if (!D || D.live || !D.loaded || !isFinite(D.t0)) return;
+  const k = Math.floor((t - D.t0) / WIN), ahead = S.speed >= 20 ? 3 : 1;
+  for (let i = k; i <= k + ahead; i++) {
+    const a = D.t0 + i * WIN; if (a > D.t1 || i < 0) continue;
+    const st = D.windows.get(i);
+    if (st === 'done' || st === 'loading' || (typeof st === 'number' && Date.now() < st) || locInflight >= 2) continue;
+    D.windows.set(i, 'loading'); locInflight++;
+    const myGen = gen, sd = D;
+    api('location', `session_key=${D.key}&date>=${iso(a)}&date<${iso(a + WIN)}`)
+      .then((rows) => { if (myGen === gen) { ingest('location', rows); sd.windows.set(i, 'done'); } })
+      .catch(() => { if (myGen === gen) sd.windows.set(i, Date.now() + 8000); })
+      .finally(() => { locInflight--; });
+  }
+}
+function pruneLoc(t) {
+  if (!D) return;
+  const lo = t - 2 * WIN, hi = t + 5 * WIN;
+  for (const [num, arr] of D.loc) D.loc.set(num, arr.filter((p) => p.t >= lo && p.t <= hi));
+  if (!D.live) for (const k of [...D.windows.keys()]) { const a = D.t0 + k * WIN; if (a + WIN < lo || a > hi) D.windows.delete(k); }
+  if (D.seen.size > 200000) D.seen = new Set([...D.seen].filter((k) => k[0] !== 'l'));
+}
+function locAt(num, t) {
+  const arr = D.loc.get(num); if (!arr || !arr.length) return null;
+  const i = lastIdx(arr, t); if (i < 0) return null;
+  const a = arr[i], b = arr[i + 1];
+  if (!b) return t - a.t < 6000 ? a : null;
+  if (b.t - a.t > 8000) return t - a.t < 3000 ? a : null;
+  const f = (t - a.t) / (b.t - a.t);
+  return { x: a.x + (b.x - a.x) * f, y: a.y + (b.y - a.y) * f };
+}
+
+/* ---------- Derived timing state ---------- */
+const TYRE = { SOFT: ['S', '#FF5A4F'], MEDIUM: ['M', '#F5C84B'], HARD: ['H', '#E8EAED'], INTERMEDIATE: ['I', '#43B02A'], WET: ['W', '#2F8FE0'] };
+function trackStatus(t) {
+  if (t < D.start) return D.isRace ? ['Pre-race', 'var(--fg-4)'] : ['Not started', 'var(--fg-4)'];
+  let st = ['Green', 'var(--green)'];
+  for (const r of D.rcArr) {
+    if (r.t > t) break;
+    const m = r.msg.toUpperCase();
+    if (r.cat === 'SafetyCar') {
+      if (/VSC DEPLOYED|VIRTUAL SAFETY CAR DEPLOYED/.test(m)) st = ['VSC', 'var(--yellow)'];
+      else if (/SAFETY CAR DEPLOYED/.test(m)) st = ['Safety car', 'var(--yellow)'];
+      else if (/ENDING|IN THIS LAP/.test(m)) st = [st[0] === 'VSC' ? 'VSC ending' : 'SC in this lap', 'var(--yellow)'];
+    } else if (r.cat === 'Flag' && (r.scope === 'Track' || !r.scope)) {
+      if (r.flag === 'RED') st = ['Red flag', 'var(--red)'];
+      else if (r.flag === 'GREEN' || r.flag === 'CLEAR') st = ['Green', 'var(--green)'];
+      else if (r.flag === 'CHEQUERED') st = r.t < D.end - 1000 ? ['Session break', 'var(--fg-4)'] : ['Chequered', '#EEF0F3'];
+    } else if (r.cat === 'SessionStatus') {
+      if (/FINISHED|ENDED/.test(m)) st = r.t < D.end - 1000 ? ['Session break', 'var(--fg-4)'] : ['Chequered', '#EEF0F3'];
+      else if (/STARTED|RESUMED/.test(m)) st = ['Green', 'var(--green)'];
+    }
+  }
+  return st;
+}
+function snapshot(t) {
+  const rows = []; let leaderLap = 0, fastest = null;
+  for (const [num, d] of D.drivers) {
+    const ps = D.pos.get(num) || []; const pi = lastIdx(ps, t);
+    const pos = pi >= 0 ? ps[pi].v : null;
+    let grid = null; if (ps.length) { const gi = lastIdx(ps, D.start); grid = (gi >= 0 ? ps[gi] : ps[0]).v; }
+    const laps = D.lapList.get(num) || [];
+    let cur = 0, last = null, best = null, lastAct = -Infinity;
+    for (const L of laps) {
+      if (isFinite(L.start) && L.start <= t) cur = Math.max(cur, L.n);
+      if (L.dur && isFinite(L.start) && L.start + L.dur * 1000 <= t) { last = L; if (!best || L.dur < best.dur) best = L; }
+      if (isFinite(L.start)) lastAct = Math.max(lastAct, L.start + (L.dur || 0) * 1000);
+    }
+    if (best && (!fastest || best.dur < fastest.dur)) fastest = { num, dur: best.dur };
+    leaderLap = Math.max(leaderLap, cur);
+    const iv = D.ints.get(num) || []; const ii = lastIdx(iv, t);
+    const sm = D.stints.get(num); let st = null; const lapNow = Math.max(1, cur);
+    if (sm) for (const s of sm.values()) if (s.from <= lapNow && (!st || s.n > st.n)) st = s;
+    let inPit = false, stops = 0;
+    for (const p of D.pitArr) { if (p.t > t) break; if (p.num === num) { stops++; if (p.lane && t < p.t + p.lane * 1000) inPit = true; } }
+    const res = D.result.get(num);
+    const out = !!(D.isRace && res && (res.dnf || res.dns) && t > lastAct + 60000);
+    rows.push({ num, d, pos, grid, cur, last, best, gap: ii >= 0 ? iv[ii].gap : null, int: ii >= 0 ? iv[ii].int : null,
+      tyre: st ? st.comp : null, age: st ? st.age0 + Math.max(0, lapNow - st.from) : null, inPit, stops, out });
+  }
+  rows.sort((a, b) => (a.pos ?? 99) - (b.pos ?? 99) || a.d.code.localeCompare(b.d.code));
+  return { rows, leaderLap, fastest };
+}
+const fmtGap = (g) => (g == null ? '–' : typeof g === 'number' ? '+' + g.toFixed(3) : String(g).replace(/^\+?/, '+'));
+
+/* ---------- Live page UI ---------- */
+const S = { playing: false, speed: [1, 5, 20].includes(store.get('speed', 5)) ? store.get('speed', 5) : 5, selected: store.get('selectedNum', null), t: NaN, logFilter: 'all' };
+const ROW_H = 50; let rowEls = new Map(), carEls = new Map(), lastPosMap = new Map();
 const SVGNS = 'http://www.w3.org/2000/svg';
-DRIVERS.forEach((d) => {
-  const tm = TEAMS[d[2]];
-  const b = document.createElement('button');
-  b.className = 'tbtn trow';
-  b.innerHTML = `<span class="pos"></span><span class="bar" style="background:${tm.c}"></span><span class="who"><span class="code">${d[0]}</span><span class="team">${tm.name}</span><span class="badge"></span></span><span class="gap"></span><span class="int"></span><span class="tyre"></span>`;
-  b.addEventListener('click', () => pick(d[0]));
-  towerEl.appendChild(b);
-  rowEls[d[0]] = { b, pos: b.querySelector('.pos'), badge: b.querySelector('.badge'), gap: b.querySelector('.gap'), int: b.querySelector('.int'), tyre: b.querySelector('.tyre') };
-
-  const g = document.createElementNS(SVGNS, 'g'); g.setAttribute('class', 'car'); g.dataset.code = d[0];
-  g.innerHTML = `<circle class="hit" r="12" fill="transparent"/><circle class="body" r="5.5" fill="${tm.c}" stroke="#0B0C0F" stroke-width="2"/><g class="lbl" display="none"><rect x="10" y="-9" width="34" height="18" rx="3" fill="#0B0C0F" stroke="${tm.c}"/><text x="27" y="4" text-anchor="middle" fill="#fff" font-family="JetBrains Mono, monospace" font-weight="700" font-size="11">${d[0]}</text></g>`;
-  const title = document.createElementNS(SVGNS, 'title'); title.textContent = d[1]; g.appendChild(title);
-  g.addEventListener('click', () => pick(d[0]));
-  $('cars').appendChild(g);
-  carEls[d[0]] = { g, body: g.querySelector('.body'), lbl: g.querySelector('.lbl') };
-});
-
-function pick(code) {
-  if (!DMAP[code]) return;
-  S.selected = code; store.set('selected', code);
-  renderTower(); renderMap();
+function buildDriverUI() {
+  const tower = $('tower'); tower.innerHTML = ''; $('cars').innerHTML = ''; rowEls = new Map(); carEls = new Map(); lastPosMap = new Map();
+  tower.style.height = Math.max(0, D.drivers.size * ROW_H - 6) + 'px';
+  for (const d of D.drivers.values()) {
+    const b = document.createElement('button'); b.className = 'tbtn trow';
+    b.innerHTML = `<span class="pos"></span><span class="bar" style="background:${esc(d.color)}"></span><span class="who"><span class="code">${esc(d.code)}</span><span class="team">${esc(d.team)}</span><span class="badge"></span></span><span class="gap"></span><span class="int"></span><span class="tyre"></span>`;
+    b.addEventListener('click', () => pick(d.num)); tower.appendChild(b);
+    rowEls.set(d.num, { b, pos: b.querySelector('.pos'), badge: b.querySelector('.badge'), gap: b.querySelector('.gap'), int: b.querySelector('.int'), tyre: b.querySelector('.tyre') });
+    const g = document.createElementNS(SVGNS, 'g'); g.setAttribute('class', 'car'); g.setAttribute('display', 'none');
+    g.innerHTML = `<circle r="22" fill="transparent"/><circle class="body" r="9" fill="${esc(d.color)}" stroke="#0B0C0F" stroke-width="3"/><g class="lbl" display="none"><rect x="16" y="-14" width="56" height="28" rx="5" fill="#0B0C0F" stroke="${esc(d.color)}" stroke-width="2"/><text x="44" y="6" text-anchor="middle" fill="#fff" font-family="JetBrains Mono, monospace" font-weight="700" font-size="17">${esc(d.code)}</text></g>`;
+    const title = document.createElementNS(SVGNS, 'title'); title.textContent = d.name; g.appendChild(title);
+    g.addEventListener('click', () => pick(d.num)); $('cars').appendChild(g);
+    carEls.set(d.num, { g, body: g.querySelector('.body'), lbl: g.querySelector('.lbl') });
+  }
+  if (!D.drivers.has(S.selected)) S.selected = D.drivers.keys().next().value ?? null;
+  $('colA').textContent = D.isRace ? 'Gap' : 'Best'; $('colB').textContent = D.isRace ? 'Int' : 'Delta'; $('selGapK').textContent = D.isRace ? 'Gap' : 'Best lap';
 }
-
-let lastPosMap = {};
+function pick(num) { if (!D || !D.drivers.has(num)) return; S.selected = num; store.set('selectedNum', num); if (D.loaded) { renderTower(); renderMap(); } }
+let lastSnap = null;
 function renderTower() {
-  const order = ordered(), lead = order[0];
-  const posMap = {};
-  order.forEach((c, i) => {
-    const el = rowEls[c.code], pos = i + 1; posMap[c.code] = pos;
+  if (!D || !D.loaded) return;
+  const t = S.t; const snap = snapshot(t); lastSnap = snap; const { rows, fastest } = snap;
+  const status = trackStatus(t); const finished = status[0] === 'Chequered';
+  rows.forEach((r, i) => {
+    const el = rowEls.get(r.num); if (!el) return;
     el.b.style.transform = `translateY(${i * ROW_H}px)`;
-    el.b.setAttribute('aria-pressed', String(c.code === S.selected));
-    el.b.setAttribute('aria-label', `P${pos} ${c.name}`);
-    el.pos.textContent = pos;
-    el.gap.textContent = i === 0 ? (c.fin !== null ? 'WINNER' : 'LEADER') : fmtGap(lead, c);
-    el.int.textContent = i === 0 ? '' : fmtInt(order[i - 1], c);
-    el.tyre.textContent = c.tyre; el.tyre.style.borderColor = el.tyre.style.color = TYRE_COL[c.tyre];
-    let badge = '', bc = '';
-    if (c.pitLeft > 0) { badge = 'PIT'; bc = 'var(--yellow)'; }
-    else if (R.fastest && R.fastest.code === c.code) { badge = '⏱'; bc = 'var(--purple)'; }
-    else { const ch = c.grid - pos; if (ch > 0) { badge = '▲' + ch; bc = 'var(--up)'; } else if (ch < 0) { badge = '▼' + (-ch); bc = 'var(--down)'; } }
-    if (badge === '⏱') { el.badge.textContent = 'FL'; el.badge.title = 'Fastest lap'; } else { el.badge.textContent = badge; el.badge.title = ''; }
-    el.badge.style.color = bc;
-    const old = lastPosMap[c.code];
-    if (old && old !== pos && c.fin === null) {
-      el.b.classList.remove('flash-up', 'flash-down'); void el.b.offsetWidth;
-      el.b.classList.add(pos < old ? 'flash-up' : 'flash-down');
+    el.b.setAttribute('aria-pressed', String(r.num === S.selected));
+    el.b.setAttribute('aria-label', `P${r.pos ?? '–'} ${r.d.name}`);
+    el.b.classList.toggle('out', r.out);
+    el.pos.textContent = r.pos ?? '–';
+    if (D.isRace) {
+      el.gap.textContent = i === 0 && r.pos ? (finished ? 'WINNER' : 'LEADER') : fmtGap(r.gap);
+      el.int.textContent = i === 0 ? '' : fmtGap(r.int);
+    } else {
+      el.gap.textContent = r.best ? fmtLap(r.best.dur) : '–';
+      el.int.textContent = r.best && fastest && r.num !== fastest.num ? '+' + (r.best.dur - fastest.dur).toFixed(3) : '';
     }
+    const ty = TYRE[r.tyre]; el.tyre.textContent = ty ? ty[0] : '–'; el.tyre.style.borderColor = el.tyre.style.color = ty ? ty[1] : '';
+    el.tyre.title = r.tyre ? `${r.tyre[0] + r.tyre.slice(1).toLowerCase()} · ${r.age} laps old` : '';
+    let badge = '', bc = '';
+    if (r.out) { badge = 'OUT'; bc = 'var(--red-fg)'; }
+    else if (r.inPit) { badge = 'PIT'; bc = 'var(--yellow)'; }
+    else if (fastest && fastest.num === r.num && D.isRace) { badge = 'FL'; bc = 'var(--purple)'; }
+    else if (D.isRace && r.grid && r.pos && t > D.start) { const ch = r.grid - r.pos; if (ch > 0) { badge = '▲' + ch; bc = 'var(--up)'; } else if (ch < 0) { badge = '▼' + -ch; bc = 'var(--down)'; } }
+    el.badge.textContent = badge; el.badge.style.color = bc; el.badge.title = badge === 'FL' ? 'Fastest lap' : '';
+    const old = lastPosMap.get(r.num);
+    if (old && r.pos && old !== r.pos) { el.b.classList.remove('flash-up', 'flash-down'); void el.b.offsetWidth; el.b.classList.add(r.pos < old ? 'flash-up' : 'flash-down'); }
+    lastPosMap.set(r.num, r.pos);
   });
-  // overtake log (top 10, debounced per pair)
-  if (R.lastOrder && R.t > 20) {
-    order.forEach((c, i) => {
-      const old = lastPosMap[c.code]; const pos = i + 1;
-      if (old && pos < old && pos <= 10 && c.fin === null && c.pitLeft === 0) {
-        const victim = order[i + 1];
-        if (!victim || victim.pitLeft > 0 || lastPosMap[victim.code] !== pos) return;
-        const k = c.code + victim.code;
-        if (R.pairT[k] && R.t - R.pairT[k] < 240) return;
-        R.pairT[k] = R.pairT[victim.code + c.code] = R.t;
-        addLog(Math.max(1, Math.floor(c.p) + 1), `${c.code} passes ${victim.code} for P${pos}`, 'ov');
-      }
-    });
-  }
-  R.lastOrder = order.map((c) => c.code);
-  lastPosMap = posMap;
-
-  // stats
-  const finished = lead.fin !== null;
-  $('lap').textContent = finished ? LAPS : Math.min(LAPS, Math.max(1, Math.floor(lead.p) + 1));
-  const tt = Math.floor(R.t), h = Math.floor(tt / 3600), m = Math.floor((tt % 3600) / 60), s = tt % 60;
-  $('clock').textContent = h + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
-  const flag = finished ? ['Chequered', '#EEF0F3'] : S.sc ? ['Safety car', 'var(--yellow)'] : ['Green', 'var(--green)'];
-  $('flag').textContent = flag[0]; $('flagsq').style.background = flag[1];
+  const ll = snap.leaderLap;
+  $('lap').textContent = ll ? (D.total ? Math.min(ll, D.total) : ll) : '–';
+  $('lapTotal').textContent = D.isRace && D.total ? '/' + D.total : '';
+  $('clock').textContent = fmtClock(t - D.start);
+  $('flag').textContent = status[0]; $('flagsq').style.background = status[1];
+  const wi = lastIdx(D.wx, t), w = wi >= 0 ? D.wx[wi] : D.wx[0];
+  $('wx').textContent = w ? `Track ${Math.round(w.track)}° · Air ${Math.round(w.air)}°${w.rain ? ' · Rain' : ''}` : '–';
   const banner = $('banner');
-  if (finished) { banner.hidden = false; banner.textContent = '🏁 ' + lead.code + ' WINS'; banner.style.background = '#EEF0F3'; banner.style.color = '#0B0C0F'; }
-  else if (S.sc) { banner.hidden = false; banner.textContent = 'SAFETY CAR DEPLOYED'; banner.style.background = 'var(--yellow)'; banner.style.color = '#17130A'; }
+  const bmap = { 'Safety car': 'SAFETY CAR', 'SC in this lap': 'SAFETY CAR IN THIS LAP', VSC: 'VIRTUAL SAFETY CAR', 'VSC ending': 'VSC ENDING', 'Red flag': 'RED FLAG' };
+  if (finished && D.isRace && rows[0] && rows[0].pos === 1) { banner.hidden = false; banner.textContent = '🏁 ' + rows[0].d.code + ' WINS'; banner.style.background = '#EEF0F3'; banner.style.color = '#0B0C0F'; }
+  else if (bmap[status[0]]) { banner.hidden = false; banner.textContent = bmap[status[0]]; banner.style.background = status[0] === 'Red flag' ? 'var(--red)' : 'var(--yellow)'; banner.style.color = '#17130A'; }
   else banner.hidden = true;
-  $('sc').disabled = finished;
-
-  // following card
-  const ci = order.findIndex((c) => c.code === S.selected), c = order[ci], tm = TEAMS[c.team];
-  $('selStripe').style.background = tm.c; $('selName').textContent = c.name; $('selTeam').textContent = tm.name;
-  $('selPos').textContent = 'P' + (ci + 1);
-  $('selGap').textContent = ci === 0 ? 'Leader' : fmtGap(lead, c);
-  $('selGrid').textContent = 'P' + c.grid;
-  $('selLast').textContent = fmtLap(c.last);
-  $('selBest').textContent = fmtLap(c.best);
-  $('selBest').style.color = R.fastest && R.fastest.code === c.code ? 'var(--purple)' : '';
-  $('selTyre').textContent = c.pitLeft > 0 ? 'In pit' : `${c.tyre} · ${Math.max(0, Math.floor(c.p - c.tyreLap))} laps`;
-  $('selTyre').style.color = c.pitLeft > 0 ? 'var(--yellow)' : TYRE_COL[c.tyre];
-  $('selChamp').textContent = `Championship: P${c.champPos} · ${c.pts} pts` + (c.pitted ? '' : ` · Pit window lap ${c.pitLap}`);
-  $('prevDrv').disabled = ci === 0; $('nextDrv').disabled = ci === order.length - 1;
-  if (logDirty) renderLog();
+  renderFollow(rows, fastest);
+  renderLog(t);
+  renderTimeline();
 }
-
-function renderMap() {
-  const order = ordered(), lead = order[0];
-  for (let i = order.length - 1; i >= 0; i--) {
-    const c = order[i], el = carEls[c.code];
-    const [x, y] = pointAt(c.p);
-    const sel = c.code === S.selected, isLead = c === lead;
-    el.g.setAttribute('transform', `translate(${x.toFixed(1)} ${y.toFixed(1)})`);
-    el.body.setAttribute('r', sel ? 8.5 : 5.5);
-    el.body.setAttribute('stroke', sel ? '#FFFFFF' : '#0B0C0F');
-    el.body.setAttribute('opacity', c.pitLeft > 0 ? 0.45 : 1);
-    el.lbl.setAttribute('display', sel || isLead ? 'inline' : 'none');
-    $('cars').appendChild(el.g); // paint order: leaders on top
+function renderFollow(rows, fastest) {
+  const ci = rows.findIndex((r) => r.num === S.selected); if (ci < 0) return;
+  const r = rows[ci], d = r.d;
+  $('selStripe').style.background = d.color; $('selName').textContent = d.name; $('selTeam').textContent = d.team + ' · #' + d.num;
+  $('selPos').textContent = r.pos ? 'P' + r.pos : '–';
+  $('selGap').textContent = D.isRace ? (ci === 0 ? 'Leader' : fmtGap(r.gap)) : (r.best ? fmtLap(r.best.dur) : '–');
+  $('selGrid').textContent = r.grid ? 'P' + r.grid : '–';
+  $('selLast').textContent = r.last ? fmtLap(r.last.dur) : '–';
+  $('selBest').textContent = r.best ? fmtLap(r.best.dur) : '–';
+  $('selBest').style.color = fastest && fastest.num === r.num ? 'var(--purple)' : '';
+  const ty = TYRE[r.tyre];
+  $('selTyre').textContent = r.inPit ? 'In pit lane' : ty ? `${ty[0]} · ${r.age} laps` : '–';
+  $('selTyre').style.color = r.inPit ? 'var(--yellow)' : ty ? ty[1] : '';
+  $('selExtra').textContent = `Lap ${r.cur || '–'} · ${r.stops} pit stop${r.stops === 1 ? '' : 's'}` + (r.out ? ' · Retired' : '');
+  $('prevDrv').disabled = ci === 0; $('nextDrv').disabled = ci === rows.length - 1;
+}
+let lastLogKey = '';
+function renderLog(t) {
+  const items = [];
+  for (const r of D.rcArr) {
+    if (r.t > t) break;
+    const m = r.msg.toUpperCase(); let k = 'oth';
+    if (r.cat === 'SafetyCar') k = 'sc';
+    else if (r.cat === 'Flag') k = r.flag === 'RED' ? 'red' : r.flag === 'CHEQUERED' ? 'fin' : 'flag';
+    else if (r.cat === 'SessionStatus') k = 'fin';
+    else if (/INVESTIGAT|PENALT|REPRIMAND|DELETED|NOTED|STEWARDS|NO FURTHER/.test(m)) k = 'std';
+    items.push({ t: r.t, lap: r.lap, text: r.msg, k });
   }
-  $('cars').appendChild(carEls[lead.code].g);
-  $('cars').appendChild(carEls[S.selected].g);
+  for (const p of D.pitArr) { if (p.t > t) break; const d = D.drivers.get(p.num); items.push({ t: p.t, lap: p.lap, text: `${d ? d.code : p.num} pits${p.lane ? ' · pit lane ' + p.lane.toFixed(1) + 's' : ''}${p.stop ? ' · stop ' + p.stop.toFixed(1) + 's' : ''}`, k: 'pit' }); }
+  const f = S.logFilter;
+  const shown = items.filter((i) => f === 'all' || (f === 'flag' && ['flag', 'sc', 'red', 'fin'].includes(i.k)) || (f === 'pit' && i.k === 'pit') || (f === 'std' && i.k === 'std')).sort((a, b) => b.t - a.t).slice(0, 80);
+  const key = f + shown.length + (shown[0] ? shown[0].t + shown[0].text : '');
+  if (key === lastLogKey) return; lastLogKey = key;
+  $('log').innerHTML = shown.length ? shown.map((i) => `<li><span class="lp">${i.lap ? 'L' + i.lap : '–'}</span><span class="k-${i.k}">${esc(i.text)}</span></li>`).join('') : '<li class="empty" style="display:block;border:0">No messages yet.</li>';
 }
-
-let logDirty = true;
-function renderLog() {
-  logDirty = false;
-  const items = R.log.filter((l) => S.logFilter === 'all' || l.kind === S.logFilter);
-  $('log').innerHTML = items.length
-    ? items.slice(0, 60).map((l) => `<li><span class="lp">${l.lap ? 'L' + l.lap : 'START'}</span><span class="k-${l.kind}">${l.text}</span></li>`).join('')
-    : '<li class="empty" style="display:block;border:0">No messages yet.</li>';
+function renderMap() {
+  if (!D || !D.loaded || !geo) return;
+  const t = S.t; const rows = lastSnap ? lastSnap.rows : []; const leader = rows[0] ? rows[0].num : null;
+  let any = false;
+  for (let i = rows.length - 1; i >= 0; i--) {
+    const r = rows[i], el = carEls.get(r.num); if (!el) continue;
+    const p = locAt(r.num, t);
+    if (!p || r.out) { el.g.setAttribute('display', 'none'); continue; }
+    any = true;
+    const [x, y] = geo.proj(p.x, p.y); const sel = r.num === S.selected;
+    el.g.setAttribute('display', 'inline'); el.g.setAttribute('transform', `translate(${x.toFixed(1)} ${y.toFixed(1)})`);
+    el.body.setAttribute('r', sel ? 13 : 9); el.body.setAttribute('stroke', sel ? '#FFFFFF' : '#0B0C0F');
+    el.body.setAttribute('opacity', r.inPit ? 0.45 : 1);
+    el.lbl.setAttribute('display', sel || r.num === leader ? 'inline' : 'none');
+  }
+  // paint order: selected and leader on top
+  for (const n of [leader, S.selected]) { const el = carEls.get(n); if (el && el.g !== $('cars').lastChild) $('cars').appendChild(el.g); }
+  $('locWait').hidden = any || t < D.start - 30000 || t > D.end;
 }
-
-function renderSchedule() {
-  const now = Date.now(); let nextFound = false;
-  $('sched').innerHTML = SCHEDULE.map(([n, iso, label]) => {
-    const t = Date.parse(iso); let cls = '';
-    if (t + 2 * 3600e3 < now) cls = 'done'; else if (!nextFound) { cls = 'now'; nextFound = true; }
-    return `<div class="${cls}"><span${n.startsWith('Race') ? ' style="font-weight:600"' : ''}>${n}</span><span class="t">${label}</span></div>`;
-  }).join('');
+let scrubbing = false;
+function renderTimeline() {
+  if (!D || D.live) return;
+  const sc = $('scrub'); sc.max = Math.round(Math.max(1, (D.t1 - D.t0) / 1000));
+  if (!scrubbing) sc.value = Math.round((S.t - D.t0) / 1000);
+  const lap = lastSnap ? lastSnap.leaderLap : 0;
+  $('tlLabel').textContent = (lap ? 'Lap ' + lap + (D.total ? '/' + D.total : '') + ' · ' : '') + fmtClock(S.t - D.start);
 }
-
-// controls
-function setPlaying(v) { S.playing = v; $('play').textContent = v ? 'Pause' : 'Play'; $('play').setAttribute('aria-label', v ? 'Pause simulation' : 'Play simulation'); }
-$('play').addEventListener('click', () => { if (ordered()[0].fin !== null && R.finishCount >= R.cars.length) { restart(); return; } setPlaying(!S.playing); });
-$('speeds').innerHTML = [1, 5, 20, 60].map((v) => `<button data-v="${v}" aria-pressed="false">${v}×</button>`).join('');
+function setPlaying(v) { S.playing = v; $('play').textContent = v ? 'Pause' : (D && D.loaded && S.t >= D.t1 ? 'Replay' : 'Play'); $('play').setAttribute('aria-label', v ? 'Pause replay' : 'Play replay'); }
+function seek(t) { if (!D || D.live || !D.loaded) return; S.t = Math.max(D.t0, Math.min(D.t1, t)); pruneLoc(S.t); ensureWindows(S.t); lastPosMap = new Map(); renderTower(); renderMap(); if (!S.playing) setPlaying(false); }
 function renderSpeeds() { $('speeds').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(+b.dataset.v === S.speed))); }
-$('speeds').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; S.speed = +b.dataset.v; store.set('speed', S.speed); renderSpeeds(); });
-function restart() { reset(); lastPosMap = {}; setPlaying(true); renderTower(); renderMap(); toast('Race restarted'); }
-$('restart').addEventListener('click', restart);
-function toggleSC(on) {
-  if (ordered()[0].fin !== null) return;
-  S.sc = on; $('sc').setAttribute('aria-pressed', String(on)); $('sc').textContent = on ? 'Recall safety car' : 'Safety car';
-  const lap = leaderLap();
-  if (on) { R.scEnd = lap + 3; addLog(lap, 'SAFETY CAR DEPLOYED', 'sc'); }
-  else { R.scEnd = null; addLog(lap, 'Safety car in this lap. Green flag.', 'sc'); }
-  renderTower();
-}
-$('sc').addEventListener('click', () => toggleSC(!S.sc));
-function shiftSel(dir) {
-  const order = ordered(); const i = order.findIndex((c) => c.code === S.selected);
-  const j = Math.min(order.length - 1, Math.max(0, i + dir)); pick(order[j].code);
-}
+$('speeds').innerHTML = [1, 5, 20].map((v) => `<button data-v="${v}" aria-pressed="false">${v}×</button>`).join('');
+$('speeds').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; S.speed = +b.dataset.v; store.set('speed', S.speed); renderSpeeds(); if (D) ensureWindows(S.t); });
+$('play').addEventListener('click', () => { if (!D || !D.loaded || D.live) return; if (!S.playing && S.t >= D.t1) seek(D.t0); setPlaying(!S.playing); });
+$('back30').addEventListener('click', () => seek(S.t - 30000));
+$('fwd30').addEventListener('click', () => seek(S.t + 30000));
+$('restart').addEventListener('click', () => { if (D && D.loaded) { seek(D.t0); setPlaying(true); } });
+$('scrub').addEventListener('input', (e) => { if (!D || !D.loaded) return; scrubbing = true; S.t = D.t0 + +e.target.value * 1000; lastPosMap = new Map(); renderTower(); });
+$('scrub').addEventListener('change', (e) => { scrubbing = false; if (D) seek(D.t0 + +e.target.value * 1000); });
+function shiftSel(dir) { if (!lastSnap) return; const rows = lastSnap.rows; const i = rows.findIndex((r) => r.num === S.selected); const j = Math.min(rows.length - 1, Math.max(0, i + dir)); pick(rows[j].num); }
 $('prevDrv').addEventListener('click', () => shiftSel(-1));
 $('nextDrv').addEventListener('click', () => shiftSel(1));
-$('logFilter').addEventListener('click', (e) => {
-  const b = e.target.closest('button'); if (!b) return; S.logFilter = b.dataset.f;
-  $('logFilter').querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); renderLog();
-});
+$('logFilter').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; S.logFilter = b.dataset.f; $('logFilter').querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); lastLogKey = ''; if (D && D.loaded) renderLog(S.t); });
 document.addEventListener('keydown', (e) => {
-  if (route !== 'live' || e.target.matches('input, textarea') || e.metaKey || e.ctrlKey || e.altKey) return;
-  if (e.code === 'Space' && !e.target.matches('button')) { e.preventDefault(); setPlaying(!S.playing); }
+  if (route !== 'live' || e.target.matches('input, textarea, select') || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (e.code === 'Space' && !e.target.matches('button')) { e.preventDefault(); $('play').click(); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); seek(S.t - 30000); }
+  else if (e.key === 'ArrowRight') { e.preventDefault(); seek(S.t + 30000); }
   else if (e.key === 'ArrowUp') { e.preventDefault(); shiftSel(-1); }
   else if (e.key === 'ArrowDown') { e.preventDefault(); shiftSel(1); }
-  else if (e.key === 'r' || e.key === 'R') restart();
 });
 
-// loop: fixed-interval sim so it keeps running even when animation frames are throttled
+function showNotice(text, retry) { $('notice').hidden = !text; $('notice').classList.toggle('err', !!retry); $('noticeText').textContent = text || ''; $('noticeBtn').hidden = !retry; $('noticeBtn').onclick = retry || null; }
+function mapMessage(text, sub) { $('mapMsg').hidden = !text; if (text) $('mapMsg').innerHTML = `<div>${esc(text)}<small>${esc(sub || '')}</small></div>`; }
+
+/* ---------- Session picker ---------- */
+const pickable = (s) => sessionDone(s) || (LIVE_KEY && sessionLiveWindow(s));
+function fillPicker() {
+  const ms = MEETINGS.filter((m) => sessionsOf(m.meeting_key).some(pickable)).sort((a, b) => T(b.date_start) - T(a.date_start));
+  $('pickMeeting').innerHTML = ms.map((m) => `<option value="${m.meeting_key}">${esc((roundNo(m) ? 'R' + roundNo(m) + ' · ' : '') + m.meeting_name)}</option>`).join('');
+  if (D) $('pickMeeting').value = D.s.meeting_key;
+  fillSessions(+$('pickMeeting').value);
+}
+function fillSessions(mk) {
+  const ss = sessionsOf(mk).filter(pickable);
+  $('pickSession').innerHTML = ss.map((s) => `<option value="${s.session_key}">${esc(s.session_name)}${sessionDone(s) ? '' : ' · live'}</option>`).join('');
+  if (D && ss.some((s) => s.session_key === D.key)) $('pickSession').value = D.key;
+}
+$('pickMeeting').addEventListener('change', (e) => {
+  const mk = +e.target.value; fillSessions(mk);
+  const ss = sessionsOf(mk).filter((s) => sessionDone(s)); const pref = ss.filter((s) => s.session_name === 'Race').pop() || ss[ss.length - 1];
+  if (pref) openSession(pref.session_key, false);
+});
+$('pickSession').addEventListener('change', (e) => { const s = SESSIONS.find((x) => x.session_key === +e.target.value); if (s) openSession(s.session_key, !sessionDone(s)); });
+$('goLive').addEventListener('click', () => { const s = SESSIONS.find((x) => sessionLiveWindow(x) && !sessionDone(x)); if (s) openSession(s.session_key, true); });
+
+/* ---------- Open a session ---------- */
+async function openSession(key, live) {
+  const s = SESSIONS.find((x) => x.session_key === key); if (!s) return;
+  const myGen = ++gen; stopLive(); setPlaying(false);
+  D = newStore(s, !!live); geo = null; lastSnap = null; lastLogKey = '';
+  const m = D.m; const rn = roundNo(m);
+  $('title').textContent = `${shortGP(m.meeting_name || s.country_name)} · ${s.session_name}`;
+  $('where').textContent = `${rn ? 'Round ' + rn + ' · ' : ''}${m.meeting_name || ''} · ${s.location || s.circuit_short_name}`;
+  $('circuit').textContent = m.circuit_short_name || s.circuit_short_name;
+  $('circuitSub').textContent = `${m.location || s.location} · ${m.circuit_type || 'Circuit'} · track shape from real GPS data`;
+  $('modePill').className = 'pill ' + (live ? 'live' : 'replay'); $('modeText').textContent = live ? 'LIVE' : 'REPLAY';
+  $('replayControls').hidden = !!live; $('timeline').hidden = !!live;
+  $('mapNote').textContent = live ? `Live data from OpenF1, shown about ${LIVE_DELAY / 1000} seconds behind real time. Click any car to follow it.` : 'Replay of real timing data. Click any car on the map or in the timing tower to follow it.';
+  $('trk1').setAttribute('points', ''); $('trk2').setAttribute('points', ''); $('sf').setAttribute('width', 0);
+  $('tower').innerHTML = ''; $('cars').innerHTML = ''; $('log').innerHTML = ''; $('banner').hidden = true; $('locWait').hidden = true;
+  ['lap', 'clock', 'flag', 'wx', 'tlLabel'].forEach((id) => { $(id).textContent = '–'; }); $('lapTotal').textContent = '';
+  showNotice(''); updateLiveUI();
+  fillPicker(); renderSchedule();
+  const opts = { proxy: !!live };
+  const parts = [['drivers', ''], ['race_control', ''], ['laps', ''], ['position', ''], ['stints', ''], ['pit', ''], ['weather', '']];
+  if (!live) parts.push(['session_result', '']);
+  if (D.isRace) parts.push(['intervals', live ? `&date>=${iso(Date.now() - 60000)}` : '']);
+  let done = 0;
+  mapMessage('Loading session data…', `0 of ${parts.length}`);
+  try {
+    await Promise.all(parts.map(async ([ep, extra]) => {
+      const rows = await api(ep, `session_key=${key}${extra}`, opts);
+      if (myGen !== gen) return;
+      ingest(ep, rows); done++; mapMessage('Loading session data…', `${done} of ${parts.length}`);
+    }));
+    if (myGen !== gen) return;
+    if (!D.drivers.size) throw new Error('OpenF1 has no data for this session yet.');
+    computeBounds();
+    buildDriverUI();
+    D.loaded = true;
+    S.t = live ? Date.now() - LIVE_DELAY : D.t0;
+    renderTower();
+    mapMessage('Drawing the track…');
+    let ok = false; try { ok = await loadTrack(myGen, opts); } catch (e) { ok = false; }
+    if (myGen !== gen) return;
+    mapMessage(ok ? '' : 'Track map unavailable for this session.', ok ? '' : 'Timing data is still shown.');
+    if (live) startLive(myGen); else { ensureWindows(S.t); setPlaying(true); }
+    renderMap();
+  } catch (err) {
+    if (myGen !== gen) return;
+    mapMessage('Could not load this session.', err.message);
+    showNotice(err.message, () => openSession(key, live));
+  }
+}
+
+/* ---------- Live mode (needs an OpenF1 key on the server) ---------- */
+const LIVE_DELAY = 10000;
+let liveTimers = [];
+function stopLive() { liveTimers.forEach(clearInterval); liveTimers = []; }
+function startLive(myGen) {
+  const q = (ms, step = 4000) => iso(Math.floor(ms / step) * step); // quantized so concurrent viewers share cached responses
+  const feeds = [
+    ['location', 4000, () => `&date>=${q(Date.now() - 20000)}`],
+    ['intervals', 6000, () => `&date>=${q(Date.now() - 40000)}`, () => D.isRace],
+    ['position', 10000, () => ''],
+    ['race_control', 10000, () => ''],
+    ['laps', 15000, () => `&date_start>=${q(Date.now() - 6 * 60000, 60000)}`],
+    ['pit', 20000, () => ''],
+    ['stints', 30000, () => ''],
+    ['weather', 60000, () => `&date>=${q(Date.now() - 5 * 60000, 60000)}`],
+    ['drivers', 300000, () => '']
+  ];
+  for (const [ep, every, extra, cond] of feeds) {
+    if (cond && !cond()) continue;
+    const run = async () => {
+      if (myGen !== gen) return;
+      try {
+        const rows = await api(ep, `session_key=${D.key}${extra()}`, { proxy: true });
+        if (myGen !== gen) return;
+        const before = D.drivers.size; ingest(ep, rows);
+        if (ep === 'laps' || ep === 'race_control') computeBounds();
+        if (ep === 'drivers' && D.drivers.size !== before) buildDriverUI();
+      } catch (e) { /* keep polling */ }
+    };
+    run(); liveTimers.push(setInterval(run, every));
+  }
+  liveTimers.push(setInterval(() => pruneLoc(Date.now() - LIVE_DELAY), 30000));
+}
+
+/* ---------- Main loop ---------- */
 let lastTs = performance.now(), towerAcc = 0;
 setInterval(() => {
-  const ts = performance.now();
-  const real = Math.min(0.5, (ts - lastTs) / 1000); lastTs = ts;
-  if (!S.playing || route !== 'live') return;
-  let dt = real * S.speed;
-  while (dt > 0) { const d = Math.min(dt, 1); step(d); dt -= d; }
+  const ts = performance.now(); const real = Math.min(0.5, (ts - lastTs) / 1000); lastTs = ts;
+  if (!D || !D.loaded || route !== 'live') return;
+  if (D.live) S.t = Date.now() - LIVE_DELAY;
+  else if (S.playing && !scrubbing) {
+    S.t += real * 1000 * S.speed;
+    if (S.t >= D.t1) { S.t = D.t1; setPlaying(false); }
+    ensureWindows(S.t);
+  }
   renderMap();
-  towerAcc += real;
-  if (towerAcc > 0.2) { towerAcc = 0; renderTower(); }
-}, 40);
+  towerAcc += real; if (towerAcc > 0.25) { towerAcc = 0; renderTower(); }
+}, 50);
+setInterval(() => { if (D && D.loaded && !D.live) pruneLoc(S.t); }, 30000);
+
+/* ---------- Weekend schedule card ---------- */
+function renderSchedule() {
+  if (!D) return; const now = Date.now(); let nextFound = false;
+  $('sched').innerHTML = sessionsOf(D.s.meeting_key).map((s) => {
+    const a = T(s.date_start), b = T(s.date_end); let cls = '';
+    if (s.is_cancelled || now > b) cls = 'done'; else if (now >= a) { cls = 'on'; nextFound = true; } else if (!nextFound) { cls = 'now'; nextFound = true; }
+    const canReplay = sessionDone(s) && s.session_key !== D.key;
+    return `<div class="${cls}"><span class="n">${esc(s.session_name)}${s.is_cancelled ? ' · cancelled' : ''}</span><span style="display:flex;align-items:center;gap:8px"><span class="t" title="Your time: ${esc(new Date(a).toLocaleString())}">${fmtTrack(a, s.gmt_offset)}</span>${canReplay ? `<button class="btn sm ghost" data-replay="${s.session_key}">Replay</button>` : ''}</span></div>`;
+  }).join('');
+}
+$('sched').addEventListener('click', (e) => { const b = e.target.closest('[data-replay]'); if (b) openSession(+b.dataset.replay, false); });
 
 /* ---------- Calendar & standings ---------- */
-const C = { filter: 'all', open: null, tab: 'drivers', q: '' };
-function roundStatus(r) {
-  const raceDay = Date.parse(r[2] + 'T23:59:59Z');
-  const now = Date.now();
-  if (raceDay < now) return 'done';
-  return 'up';
+const C = { filter: 'all', open: null, tab: 'drivers', q: '', standings: null, standErr: null, loadingStand: false };
+function meetingStatus(m) {
+  if (m.is_cancelled) return 'cxl';
+  const ss = sessionsOf(m.meeting_key); const now = Date.now();
+  const b = ss.length ? Math.max(...ss.map((s) => T(s.date_end))) : T(m.date_end);
+  return now > b ? 'done' : 'up';
 }
-function nextRoundIdx() { return ROUNDS.findIndex((r) => roundStatus(r) !== 'done'); }
-function fmtDate(iso) { return new Date(iso + 'T12:00:00Z').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' }); }
 function renderRounds() {
-  const ni = nextRoundIdx();
-  const html = ROUNDS.map((r, i) => {
-    const st = i === ni ? 'next' : roundStatus(r);
-    if (C.filter === 'up' && st === 'done') return '';
+  if (!MEETINGS.length) return;
+  let nextShown = false;
+  const html = MEETINGS.map((m) => {
+    if (isTesting(m)) return '';
+    let st = meetingStatus(m);
+    if (st === 'up' && !nextShown) { st = 'next'; nextShown = true; }
+    const ss = sessionsOf(m.meeting_key); const sprint = ss.some((s) => s.session_name === 'Sprint');
+    if (C.filter === 'up' && !['up', 'next'].includes(st)) return '';
     if (C.filter === 'done' && st !== 'done') return '';
-    if (C.filter === 'sprint' && !r[5]) return '';
-    const chip = st === 'done' ? '<span class="chip done">DONE</span>' : st === 'next' ? '<span class="chip next">NEXT</span>' : '<span class="chip up">UPCOMING</span>';
-    const open = C.open === i;
-    const dist = (r[3] * r[4]).toFixed(3);
+    if (C.filter === 'sprint' && !sprint) return '';
+    const race = ss.find((s) => s.session_name === 'Race') || ss[ss.length - 1];
+    const chip = { done: '<span class="chip done">DONE</span>', next: '<span class="chip next">NEXT</span>', up: '<span class="chip up">UPCOMING</span>', cxl: '<span class="chip cxl">CANCELLED</span>' }[st];
+    const open = C.open === m.meeting_key; const rn = roundNo(m);
     return `<div class="rnd ${st}" data-open="${open}">
-      <button data-i="${i}" aria-expanded="${open}"><span class="no">${String(i + 1).padStart(2, '0')}</span>
-        <span class="gp">${r[0]}${r[5] ? ' <span class="chip sprint">SPRINT</span>' : ''}<small>${r[1]} · ${r[6]}</small></span>
-        <span class="dt">${fmtDate(r[2])}</span>${chip}</button>
-      ${open ? `<div class="detail">
-        <div class="tile"><div class="k">Race day</div><div class="v">${fmtDate(r[2])}</div></div>
-        <div class="tile"><div class="k">Lap length</div><div class="v">${r[3].toFixed(3)} km</div></div>
-        <div class="tile"><div class="k">Laps</div><div class="v">${r[4]}</div></div>
-        <div class="tile"><div class="k">Race distance</div><div class="v">${dist} km</div></div>
-        <div class="act">${r[0].startsWith('Singapore') ? '<a class="btn" href="#live" style="text-decoration:none">Watch live tracker</a>' : ''}
-          <button class="btn ghost" data-copy="${i}">Copy details</button></div>
-      </div>` : ''}
+      <button data-mk="${m.meeting_key}" aria-expanded="${open}"><span class="no">${rn ? String(rn).padStart(2, '0') : '—'}</span>
+        <span class="gp"><span>${esc(m.meeting_name)}</span>${sprint ? ' <span class="chip sprint">SPRINT</span>' : ''}<small>${esc(m.circuit_short_name)} · ${esc(m.location)} · ${esc(m.country_name)}</small></span>
+        <span class="dt">${race ? fmtDay(T(race.date_start), race.gmt_offset) : ''}</span>${chip}</button>
+      ${open ? `<div class="detail"><div class="sched">${ss.map((s) => {
+        const done = sessionDone(s), liveNow = sessionLiveWindow(s) && !done;
+        const act = s.is_cancelled ? '<span class="chip cxl">CANCELLED</span>' : done ? `<button class="btn sm" data-replay="${s.session_key}">Replay</button>` : liveNow ? `<button class="btn sm" data-live="${s.session_key}">Live now</button>` : '';
+        return `<div class="${done || s.is_cancelled ? 'done' : ''}"><span class="n">${esc(s.session_name)}</span><span style="display:flex;align-items:center;gap:8px"><span class="t" title="Your time: ${esc(new Date(T(s.date_start)).toLocaleString())}">${fmtTrack(T(s.date_start), s.gmt_offset)}</span>${act}</span></div>`;
+      }).join('')}</div></div>` : ''}
     </div>`;
   }).join('');
   $('rounds').innerHTML = html || '<div class="empty">No rounds match this filter.</div>';
 }
 $('rounds').addEventListener('click', (e) => {
-  const cp = e.target.closest('[data-copy]');
-  if (cp) { const r = ROUNDS[+cp.dataset.copy]; copy(`Round ${+cp.dataset.copy + 1}: ${r[0]} · ${r[1]} · ${fmtDate(r[2])} · ${r[4]} laps`); return; }
-  const b = e.target.closest('button[data-i]'); if (!b) return;
-  const i = +b.dataset.i; C.open = C.open === i ? null : i; renderRounds();
+  const r = e.target.closest('[data-replay]'); if (r) { location.hash = 'live'; openSession(+r.dataset.replay, false); return; }
+  const l = e.target.closest('[data-live]'); if (l) { location.hash = 'live'; if (LIVE_KEY) openSession(+l.dataset.live, true); else showNotice(liveHelp()); return; }
+  const b = e.target.closest('button[data-mk]'); if (!b) return;
+  const mk = +b.dataset.mk; C.open = C.open === mk ? null : mk; renderRounds();
 });
-$('calFilter').addEventListener('click', (e) => {
-  const b = e.target.closest('button'); if (!b) return; C.filter = b.dataset.f;
-  $('calFilter').querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); renderRounds();
-});
-function copy(text) {
-  const done = () => toast('Copied to clipboard');
-  try { navigator.clipboard.writeText(text).then(done, () => toast(text)); } catch (e) { toast(text); }
-}
-$('copyRace').addEventListener('click', () => copy('Singapore Grand Prix · Sun 11 Oct 2026 · 20:00 SGT (12:00 UTC)'));
+$('calFilter').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; C.filter = b.dataset.f; $('calFilter').querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); renderRounds(); });
 
-function teamTable() {
-  const t = {};
-  DRIVERS.forEach((d) => { (t[d[2]] = t[d[2]] || { id: d[2], pts: 0, drivers: [] }).pts += d[3]; t[d[2]].drivers.push(d[0]); });
-  return Object.values(t).sort((a, b) => b.pts - a.pts);
+async function loadStandings() {
+  if (C.standings || C.loadingStand) return; C.loadingStand = true; C.standErr = null;
+  try {
+    const races = SESSIONS.filter((s) => s.session_type === 'Race' && sessionDone(s)).sort((a, b) => T(b.date_end) - T(a.date_end));
+    for (const s of races.slice(0, 4)) {
+      const drv = await api('championship_drivers', `session_key=${s.session_key}`);
+      if (!drv.length) continue;
+      const teams = await api('championship_teams', `session_key=${s.session_key}`);
+      const people = await api('drivers', `session_key=${s.session_key}`);
+      const pm = new Map(people.map((p) => [p.driver_number, p]));
+      const tc = new Map(people.map((p) => [p.team_name, '#' + (p.team_colour || '888888')]));
+      C.standings = { session: s,
+        drivers: drv.sort((a, b) => a.position_current - b.position_current).map((r) => { const p = pm.get(r.driver_number) || {}; return { ...r, code: p.name_acronym || String(r.driver_number), name: p.full_name ? titleCase(p.full_name) : '#' + r.driver_number, team: p.team_name || '', color: '#' + (p.team_colour || '888888') }; }),
+        teams: teams.sort((a, b) => a.position_current - b.position_current).map((t) => ({ ...t, color: tc.get(t.team_name) || '#888888', drivers: people.filter((p) => p.team_name === t.team_name).map((p) => p.name_acronym) })) };
+      break;
+    }
+    if (!C.standings) C.standErr = 'Standings are not available yet.';
+  } catch (e) { C.standErr = e.message; }
+  C.loadingStand = false; renderStandings(); renderSeason();
 }
 function renderStandings() {
-  const q = C.q.trim().toLowerCase(); const list = $('standList');
+  const list = $('standList');
+  if (!C.standings) { list.innerHTML = `<div class="empty">${esc(C.standErr || 'Loading standings…')}</div>`; return; }
+  const q = C.q.trim().toLowerCase(); const st = C.standings; const m = meetingOf(st.session);
+  $('standNote').textContent = `After the ${m ? m.meeting_name : 'latest race'} (${st.session.session_name.toLowerCase()}). Select a driver to replay that race following them.`;
+  const fmtPts = (p) => (Number.isInteger(p) ? p : +p.toFixed(1));
+  const chg = (a, b) => { const d = a - b; return d > 0 ? `<span class="chg" style="color:var(--up)">▲${d}</span>` : d < 0 ? `<span class="chg" style="color:var(--down)">▼${-d}</span>` : ''; };
   if (C.tab === 'drivers') {
-    const max = DRIVERS[0][3] || 1;
-    const rows = DRIVERS.filter((d) => !q || d[1].toLowerCase().includes(q) || d[0].toLowerCase().includes(q) || TEAMS[d[2]].name.toLowerCase().includes(q));
-    list.innerHTML = rows.length ? rows.map((d) => { const tm = TEAMS[d[2]]; return `<button class="srow" data-code="${d[0]}" aria-label="Follow ${d[1]} in live tracker">
-      <span class="p">${d.champPos}</span><span style="height:28px;border-radius:2px;background:${tm.c}"></span>
-      <span class="nmx"><span><b>${d[1]}</b> <small>${tm.name}</small></span><span class="meter"><i style="width:${(d[3] / max * 100).toFixed(1)}%;background:${tm.c}"></i></span></span>
-      <span class="pts">${d[3]}</span></button>`; }).join('') : '<div class="empty">No drivers match “' + q.replace(/[<>&"]/g, '') + '”.</div>';
+    const max = st.drivers[0] ? st.drivers[0].points_current || 1 : 1;
+    const rows = st.drivers.filter((d) => !q || d.name.toLowerCase().includes(q) || d.code.toLowerCase().includes(q) || d.team.toLowerCase().includes(q));
+    list.innerHTML = rows.length ? rows.map((d) => `<button class="srow" data-num="${d.driver_number}" aria-label="Replay the race following ${esc(d.name)}">
+      <span class="p">${d.position_current}</span><span style="height:28px;border-radius:2px;background:${esc(d.color)}"></span>
+      <span class="nmx"><span><b>${esc(d.name)}</b>${chg(d.position_start, d.position_current)} <small>${esc(d.team)}</small></span><span class="meter"><i style="width:${(d.points_current / max * 100).toFixed(1)}%;background:${esc(d.color)}"></i></span></span>
+      <span class="pts">${fmtPts(d.points_current)}</span></button>`).join('') : `<div class="empty">No drivers match “${esc(q)}”.</div>`;
   } else {
-    const tt = teamTable(); const max = tt[0].pts || 1;
-    const rows = tt.map((t, i) => ({ ...t, pos: i + 1 })).filter((t) => !q || TEAMS[t.id].name.toLowerCase().includes(q) || t.drivers.some((c) => DMAP[c][1].toLowerCase().includes(q)));
-    list.innerHTML = rows.length ? rows.map((t) => { const tm = TEAMS[t.id]; return `<button class="srow" data-code="${t.drivers[0]}" aria-label="Follow ${tm.name} in live tracker">
-      <span class="p">${t.pos}</span><span style="height:28px;border-radius:2px;background:${tm.c}"></span>
-      <span class="nmx"><span><b>${tm.name}</b> <small>${t.drivers.join(' · ')}</small></span><span class="meter"><i style="width:${(t.pts / max * 100).toFixed(1)}%;background:${tm.c}"></i></span></span>
-      <span class="pts">${t.pts}</span></button>`; }).join('') : '<div class="empty">No teams match.</div>';
+    const max = st.teams[0] ? st.teams[0].points_current || 1 : 1;
+    const rows = st.teams.filter((t) => !q || t.team_name.toLowerCase().includes(q) || t.drivers.some((c) => String(c).toLowerCase().includes(q)));
+    list.innerHTML = rows.length ? rows.map((t) => `<div class="srow">
+      <span class="p">${t.position_current}</span><span style="height:28px;border-radius:2px;background:${esc(t.color)}"></span>
+      <span class="nmx"><span><b>${esc(t.team_name)}</b>${chg(t.position_start, t.position_current)} <small>${esc(t.drivers.join(' · '))}</small></span><span class="meter"><i style="width:${(t.points_current / max * 100).toFixed(1)}%;background:${esc(t.color)}"></i></span></span>
+      <span class="pts">${fmtPts(t.points_current)}</span></div>`).join('') : '<div class="empty">No teams match.</div>';
   }
 }
-$('standList').addEventListener('click', (e) => { const b = e.target.closest('.srow'); if (!b) return; pick(b.dataset.code); location.hash = 'live'; toast('Following ' + DMAP[b.dataset.code][1]); });
-$('standTabs').addEventListener('click', (e) => {
-  const b = e.target.closest('button'); if (!b) return; C.tab = b.dataset.t;
-  $('standTabs').querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); renderStandings();
+$('standList').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-num]'); if (!b || !C.standings) return;
+  S.selected = +b.dataset.num; store.set('selectedNum', S.selected);
+  location.hash = 'live'; openSession(C.standings.session.session_key, false);
 });
+$('standTabs').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; C.tab = b.dataset.t; $('standTabs').querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); renderStandings(); });
 $('standSearch').addEventListener('input', (e) => { C.q = e.target.value; renderStandings(); });
 
+function nextSession() { const now = Date.now(); return SESSIONS.filter((s) => !s.is_cancelled && T(s.date_end) > now).sort((a, b) => T(a.date_start) - T(b.date_start))[0]; }
 function renderSeason() {
-  const done = ROUNDS.filter((r) => roundStatus(r) === 'done').length;
-  $('seasonDone').textContent = `${done} of ${ROUNDS.length} rounds`;
-  const pct = Math.round(done / ROUNDS.length * 100);
-  $('seasonPct').textContent = pct + '%'; $('seasonBar').style.width = pct + '%';
-  $('ldr').textContent = DRIVERS[0][1].split(' ').pop() + ' · ' + DRIVERS[0][3];
-  $('ldrGap').textContent = '+' + (DRIVERS[0][3] - DRIVERS[1][3]) + ' pts';
-  $('topTeam').textContent = TEAMS[teamTable()[0].id].name;
-  const left = ROUNDS.slice(done).reduce((s, r) => s + 25 + (r[5] ? 8 : 0), 0);
+  if (!MEETINGS.length) return;
+  const rounds = MEETINGS.filter((m) => !isTesting(m) && !m.is_cancelled);
+  const done = rounds.filter((m) => meetingStatus(m) === 'done').length;
+  $('seasonDone').textContent = `${done} of ${rounds.length} rounds`;
+  const pct = rounds.length ? Math.round(done / rounds.length * 100) : 0; $('seasonPct').textContent = pct + '%'; $('seasonBar').style.width = pct + '%';
+  const left = SESSIONS.filter((s) => !s.is_cancelled && s.session_type === 'Race' && Date.now() < T(s.date_end)).reduce((n, s) => n + (s.session_name === 'Sprint' ? 8 : 25), 0);
   $('ptsLeft').textContent = left;
-  const ni = nextRoundIdx();
-  if (ni >= 0) {
-    const r = ROUNDS[ni];
-    $('nextName').textContent = r[0];
-    $('nextSub').textContent = `Round ${ni + 1} · ${r[1]} · ${fmtDate(r[2])}` + (r[0].startsWith('Singapore') ? ' · 20:00 local' : '');
-  }
+  const st = C.standings;
+  if (st && st.drivers.length > 1) { $('ldr').textContent = st.drivers[0].name.split(' ').pop() + ' · ' + st.drivers[0].points_current; $('ldrGap').textContent = '+' + (st.drivers[0].points_current - st.drivers[1].points_current) + ' pts'; }
+  if (st && st.teams.length) $('topTeam').textContent = st.teams[0].team_name;
+  const n = nextSession();
+  if (n) {
+    const m = meetingOf(n) || {}; const liveNow = Date.now() >= T(n.date_start);
+    $('nextName').textContent = `${m.meeting_name || n.country_name} · ${n.session_name}`;
+    $('nextSub').textContent = `${roundNo(m) ? 'Round ' + roundNo(m) + ' · ' : ''}${n.circuit_short_name} · ${fmtTrack(T(n.date_start), n.gmt_offset)} track time · ${new Date(T(n.date_start)).toLocaleString([], { weekday: 'short', hour: '2-digit', minute: '2-digit' })} your time`;
+    $('nextSprint').hidden = !sessionsOf(n.meeting_key).some((s) => s.session_name === 'Sprint');
+    $('nextTag').textContent = liveNow ? 'ON NOW' : 'NEXT SESSION';
+  } else { $('nextName').textContent = 'Season complete'; $('nextSub').textContent = ''; }
 }
 function tickCountdown() {
-  let ms = SG_RACE - Date.now();
-  const tag = $('nextTag');
-  if (ms <= 0) { tag.textContent = ms > -2 * 3600e3 ? 'RACE UNDERWAY' : 'RACE FINISHED'; ms = 0; }
-  else tag.textContent = ms < 4 * 86400e3 ? 'THIS WEEKEND' : 'NEXT RACE';
+  const n = nextSession(); let ms = n ? T(n.date_start) - Date.now() : 0; if (ms < 0) ms = 0;
   const s = Math.floor(ms / 1000);
-  $('cdD').textContent = Math.floor(s / 86400);
-  $('cdH').textContent = String(Math.floor(s % 86400 / 3600)).padStart(2, '0');
-  $('cdM').textContent = String(Math.floor(s % 3600 / 60)).padStart(2, '0');
-  $('cdS').textContent = String(s % 60).padStart(2, '0');
+  $('cdD').textContent = Math.floor(s / 86400); $('cdH').textContent = String(Math.floor(s % 86400 / 3600)).padStart(2, '0');
+  $('cdM').textContent = String(Math.floor(s % 3600 / 60)).padStart(2, '0'); $('cdS').textContent = String(s % 60).padStart(2, '0');
+}
+$('copyNext').addEventListener('click', () => {
+  const n = nextSession(); if (!n) return; const m = meetingOf(n) || {};
+  const text = `${m.meeting_name} · ${n.session_name} · ${fmtTrack(T(n.date_start), n.gmt_offset)} track time (${new Date(T(n.date_start)).toUTCString()})`;
+  try { navigator.clipboard.writeText(text).then(() => toast('Copied to clipboard'), () => toast(text)); } catch (e) { toast(text); }
+});
+
+/* ---------- Live availability ---------- */
+function liveHelp() { return 'Real-time timing needs an OpenF1 live key on the server (see the README). Free replays open about 30 minutes after a session ends.'; }
+function updateLiveUI() {
+  const liveS = SESSIONS.find((s) => sessionLiveWindow(s) && !sessionDone(s));
+  $('goLive').hidden = !(liveS && LIVE_KEY && !(D && D.live && D.key === liveS.session_key));
+  if (liveS && !LIVE_KEY && route === 'live' && $('notice').hidden) showNotice(`${(meetingOf(liveS) || {}).meeting_name || ''} ${liveS.session_name} is on now. ${liveHelp()}`);
 }
 
 /* ---------- Routing ---------- */
 let route = 'live';
 function onRoute() {
   route = location.hash === '#calendar' ? 'calendar' : 'live';
-  $('page-live').hidden = route !== 'live';
-  $('page-calendar').hidden = route !== 'calendar';
+  $('page-live').hidden = route !== 'live'; $('page-calendar').hidden = route !== 'calendar';
   document.querySelectorAll('nav a').forEach((a) => { if (a.dataset.route === route) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
-  if (route === 'calendar') { renderSeason(); renderRounds(); renderStandings(); tickCountdown(); }
-  else { renderSchedule(); renderTower(); renderMap(); }
+  if (route === 'calendar' && SESSIONS.length) { renderRounds(); renderSeason(); tickCountdown(); renderStandings(); loadStandings(); }
   window.scrollTo(0, 0);
 }
 window.addEventListener('hashchange', onRoute);
 
-reset();
+/* ---------- Boot ---------- */
+async function boot() {
+  onRoute();
+  mapMessage('Loading the 2026 season…');
+  try {
+    const [, meetings, sessions] = await Promise.all([checkProxy().then((v) => { LIVE_KEY = v; }), api('meetings', 'year=2026'), api('sessions', 'year=2026')]);
+    MEETINGS = meetings.sort((a, b) => T(a.date_start) - T(b.date_start)); SESSIONS = sessions;
+  } catch (err) {
+    mapMessage('Could not reach OpenF1.', err.message); showNotice(err.message, () => location.reload()); return;
+  }
+  if (route === 'calendar') onRoute();
+  const liveS = SESSIONS.find((s) => sessionLiveWindow(s) && !sessionDone(s));
+  if (liveS && LIVE_KEY) openSession(liveS.session_key, true);
+  else {
+    const done = SESSIONS.filter((s) => sessionDone(s)).sort((a, b) => T(b.date_end) - T(a.date_end));
+    if (done[0]) openSession(done[0].session_key, false); else mapMessage('No finished sessions yet.');
+  }
+}
 renderSpeeds();
-setPlaying(true);
-onRoute();
-setInterval(() => { if (route === 'calendar') tickCountdown(); else renderSchedule(); }, 1000);
+setInterval(() => { if (route === 'calendar') tickCountdown(); }, 1000);
+setInterval(() => { if (SESSIONS.length) { updateLiveUI(); if (route === 'live') renderSchedule(); else renderSeason(); } }, 30000);
+boot();
 })();
 </script>
